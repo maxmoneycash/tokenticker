@@ -1,11 +1,18 @@
+<div align="center">
+
 # turbotokens
 
-**Know what your AI coding agents are costing you — as it happens.**
+**Real-time token telemetry for AI coding agents.**
+
+Every token your agents burn, turned into a live ticker: dashboards, instant cost<br>
+reports, budget alerts, and metrics you can pipe anywhere. One Rust binary. No runtime.
 
 [![ci](https://github.com/maxmoneycash/turbotokens/actions/workflows/ci.yml/badge.svg)](https://github.com/maxmoneycash/turbotokens/actions/workflows/ci.yml)
 [![release](https://img.shields.io/github/v/release/maxmoneycash/turbotokens)](https://github.com/maxmoneycash/turbotokens/releases)
 
-Claude Code, Codex, and a dozen other agents write every token they burn into local log files. turbotokens turns those logs into a live ticker of your AI spend: a real-time dashboard, instant cost reports, budget alerts, and metrics you can pipe anywhere. A single Rust binary, no runtime to install. Reports that used to take seconds come back in milliseconds — and new usage shows up in about a tenth of a second.
+<img src="assets/live-demo.gif" alt="turbotokens live dashboard — tokens, cost, burn rate, active sessions, and events streaming in real time" width="900">
+
+</div>
 
 ## Install
 
@@ -15,17 +22,21 @@ curl -fsSL https://raw.githubusercontent.com/maxmoneycash/turbotokens/main/insta
 
 Prebuilt binaries for macOS (arm64/x64) and Linux (x64) are on the [Releases](https://github.com/maxmoneycash/turbotokens/releases) page. Or build from source: `cargo install --path rust/crates/turbotokens --features fetch-litellm-pricing`.
 
-## See your spend live
+## Why turbotokens
+
+- **Live** — usage hits your screen ~100 ms after the agent writes it. Not a poller: a stream.
+- **Fast** — a full report over 2.5 GB of logs in **145 ms** cold, **10 ms** warm, **<1 ms** from the daemon.
+- **Every agent** — 17 agents out of the box: Claude Code, Codex, OpenCode, Amp, Gemini, Copilot, Kimi, Grok Build, Qwen, and more.
+- **Built to integrate** — JSON on every command, a Prometheus endpoint, webhook budget alerts, shell completions.
+
+## Watch spend as it happens
 
 ```bash
-turbotokens live
+turbotokens live                    # Claude Code
+turbotokens live --agent codex      # or Codex
 ```
 
-![turbotokens live dashboard: today's tokens and cost, burn-rate sparkline, model share bars, active sessions, and a stream of usage events](assets/live-dashboard.png)
-
-A dashboard that updates the moment an agent writes a log line: today's tokens and cost, burn rate over the last 5 minutes, which models you're using, which sessions are active right now, and a stream of every usage event as it lands.
-
-Point it at whatever you use: `turbotokens live --agent codex`.
+Today's tokens and cost, burn rate over the last 5 minutes, model share, which sessions are active right now, and every usage event as it lands.
 
 ## Turn telemetry into action
 
@@ -50,7 +61,7 @@ turbotokens blocks             # 5-hour billing windows
 turbotokens daily --watch      # auto-refresh as logs change
 ```
 
-![turbotokens daily report table](assets/daily-report.png)
+![turbotokens daily report: date, models, input/output/cache tokens, and cost in a table](assets/daily-report.png)
 
 Want them instant, always, even while you work?
 
@@ -70,7 +81,7 @@ Measured on a real 2.5 GB / 1,641-file dataset, median of 10+ runs, byte-identic
 | Same report on an unchanged dataset | **10 ms** |
 | Report served by the daemon | **< 1 ms** |
 | Live event latency (log write → on screen) | **p95 ≈ 110 ms** |
-| Agents supported | **17** (Claude Code, Codex, OpenCode, Amp, Gemini, Copilot, Kimi, Grok Build, Qwen, and more) |
+| Agents supported | **17** |
 
 ## How it compares
 
@@ -94,8 +105,8 @@ That's **43–68x faster** than the most popular alternative on a cold scan and 
 ```bash
 $ turbotokens doctor
 ✓ version: 1.0.0
-✓ claude data: ~/.claude (1,084 JSONL files, 1.6 GB)
-✓ codex data: ~/.codex/sessions (559 JSONL files)
+✓ claude data: ~/.claude (1,084 JSONL files, 2.1 GB)
+✓ codex data: ~/.codex/sessions (557 JSONL files, 0.4 GB)
 ✓ parse cache: 5,946 entries, 99.8 MB
 ✓ embedded pricing: loadable (460 models)
 ```
