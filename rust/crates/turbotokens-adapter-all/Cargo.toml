@@ -1,0 +1,32 @@
+[package]
+name = "turbotokens-adapter-all"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+turbotokens-adapter-amp.workspace = true
+turbotokens-adapter-claude.workspace = true
+turbotokens-adapter-codebuff.workspace = true
+turbotokens-adapter-codex.workspace = true
+turbotokens-adapter-common.workspace = true
+turbotokens-adapter-copilot.workspace = true
+turbotokens-adapter-droid.workspace = true
+turbotokens-adapter-gemini.workspace = true
+turbotokens-adapter-goose.workspace = true
+turbotokens-adapter-grok.workspace = true
+turbotokens-adapter-hermes.workspace = true
+turbotokens-adapter-kilo.workspace = true
+turbotokens-adapter-kimi.workspace = true
+turbotokens-adapter-openclaw.workspace = true
+turbotokens-adapter-opencode.workspace = true
+turbotokens-adapter-pi.workspace = true
+turbotokens-adapter-qwen.workspace = true
+turbotokens-cli.workspace = true
+turbotokens-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+turbotokens-test-support.workspace = true
+insta.workspace = true

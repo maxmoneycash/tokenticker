@@ -1,0 +1,54 @@
+[package]
+name = "turbotokens"
+version.workspace = true
+edition.workspace = true
+build = "build.rs"
+publish.workspace = true
+
+[[bin]]
+name = "turbotokens"
+path = "src/main.rs"
+
+[features]
+# Enabled by the Windows release build, which cannot get the pricing snapshot
+# from the pinned Nix input the way every other platform does.
+fetch-litellm-pricing = ["turbotokens-core/fetch-litellm-pricing"]
+
+[dependencies]
+turbotokens-adapter-all.workspace = true
+turbotokens-adapter-amp.workspace = true
+turbotokens-adapter-claude.workspace = true
+turbotokens-adapter-codebuff.workspace = true
+turbotokens-adapter-codex.workspace = true
+turbotokens-adapter-common.workspace = true
+turbotokens-adapter-copilot.workspace = true
+turbotokens-adapter-droid.workspace = true
+turbotokens-adapter-gemini.workspace = true
+turbotokens-adapter-goose.workspace = true
+turbotokens-adapter-grok.workspace = true
+turbotokens-adapter-hermes.workspace = true
+turbotokens-adapter-kilo.workspace = true
+turbotokens-adapter-kimi.workspace = true
+turbotokens-adapter-openclaw.workspace = true
+turbotokens-adapter-opencode.workspace = true
+turbotokens-adapter-pi.workspace = true
+turbotokens-adapter-qwen.workspace = true
+turbotokens-cli-parser.workspace = true
+turbotokens-cli.workspace = true
+turbotokens-config.workspace = true
+turbotokens-core.workspace = true
+memchr.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+ureq.workspace = true
+
+[build-dependencies]
+serde_json.workspace = true
+
+[dev-dependencies]
+turbotokens-test-support.workspace = true
+
+# mimalloc measurably beats the system allocator on the allocation-heavy
+# JSONL parsing paths (musl static builds and macOS included).
+[target.'cfg(not(target_os = "windows"))'.dependencies]
+mimalloc.workspace = true

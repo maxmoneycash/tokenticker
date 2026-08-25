@@ -1,0 +1,64 @@
+---
+source: crates/turbotokens-cli-parser/src/tests.rs
+expression: cases
+---
+[
+  {
+    "args": [
+      "turbotokens",
+      "--daily"
+    ],
+    "error": "Report flags like --daily are not supported. Use \"turbotokens daily\" instead."
+  },
+  {
+    "args": [
+      "turbotokens",
+      "daily",
+      "--agent",
+      "codex"
+    ],
+    "error": "Agent filters like --agent are not supported. Use \"turbotokens <agent> <report>\", for example \"turbotokens codex daily\"."
+  },
+  {
+    "args": [
+      "turbotokens",
+      "codex",
+      "blocks"
+    ],
+    "error": "The \"blocks\" report is only available for Claude Code usage.\nUse \"turbotokens codex daily\" for Codex usage reports."
+  },
+  {
+    "args": [
+      "turbotokens",
+      "--mode",
+      "bad"
+    ],
+    "error": "Invalid cost mode 'bad'"
+  },
+  {
+    "args": [
+      "turbotokens",
+      "blocks",
+      "--session-length",
+      "abc"
+    ],
+    "error": "Invalid value for --session-length"
+  },
+  {
+    "args": [
+      "turbotokens",
+      "statusline",
+      "--visual-burn-rate",
+      "loud"
+    ],
+    "error": "Invalid visual burn rate 'loud'"
+  },
+  {
+    "args": [
+      "turbotokens",
+      "pi",
+      "weekly"
+    ],
+    "error": "The \"weekly\" report is not available for pi-agent usage.\nUse \"turbotokens pi daily\" for pi-agent usage reports."
+  }
+]

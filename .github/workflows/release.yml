@@ -1,0 +1,52 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            target: aarch64-apple-darwin
+            asset: turbotokens-macos-arm64.tar.gz
+          - os: macos-13
+            target: x86_64-apple-darwin
+            asset: turbotokens-macos-x64.tar.gz
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            asset: turbotokens-linux-x64.tar.gz
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          target: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Build release binary
+        run: cargo build --release --bin turbotokens --features fetch-litellm-pricing --target ${{ matrix.target }}
+        working-directory: rust
+
+      - name: Verify binary runs
+        run: ./rust/target/${{ matrix.target }}/release/turbotokens --version
+
+      - name: Package tarball
+        run: |
+          mkdir -p dist
+          cp "rust/target/${{ matrix.target }}/release/turbotokens" dist/turbotokens
+          cp README.md dist/
+          tar -C dist -czf "${{ matrix.asset }}" turbotokens README.md
+
+      - name: Upload to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.asset }}

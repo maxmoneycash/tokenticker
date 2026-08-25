@@ -1,0 +1,12 @@
+name: Feature request
+description: Suggest an idea
+title: "[feat] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would make turbotokens more useful for you?
+      description: Describe the workflow or pain point first, the feature second.
+    validations:
+      required: true

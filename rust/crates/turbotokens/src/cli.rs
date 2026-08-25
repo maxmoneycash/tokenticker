@@ -1,0 +1,47 @@
+mod last_window;
+
+use std::{env, ffi::OsString, process};
+
+pub(crate) use turbotokens_cli::*;
+pub(crate) use turbotokens_cli_parser::Cli;
+
+use turbotokens_config::ConfigContext;
+
+use crate::DEFAULT_SESSION_DURATION_HOURS;
+
+pub(crate) fn parse() -> Cli {
+    let args = env::args_os().collect::<Vec<_>>();
+    let arg_strings = args_to_strings(args.iter().skip(1).cloned()).unwrap_or_else(|message| {
+        exit_with_usage(&message);
+    });
+    let config = ConfigContext::from_args(&arg_strings);
+    let mut cli = Cli::parse_from_with_config(
+        args,
+        &config,
+        DEFAULT_SESSION_DURATION_HOURS,
+        env!("TURBOTOKENS_VERSION"),
+    )
+    .unwrap_or_else(|message| exit_with_usage(&message));
+    if let Err(message) = last_window::resolve(&mut cli) {
+        exit_with_usage(&message);
+    }
+    cli
+}
+
+fn exit_with_usage(message: &str) -> ! {
+    eprintln!("{message}");
+    eprintln!("Run 'turbotokens --help' for usage.");
+    process::exit(2);
+}
+
+fn args_to_strings<I>(args: I) -> Result<Vec<String>, String>
+where
+    I: IntoIterator<Item = OsString>,
+{
+    args.into_iter()
+        .map(|arg| {
+            arg.into_string()
+                .map_err(|_| "Arguments must be valid UTF-8".to_string())
+        })
+        .collect()
+}

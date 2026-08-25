@@ -1,0 +1,71 @@
+[workspace]
+# adapters/ holds the per-source adapters plus the helpers they share; crates/ holds
+# everything that is not tied to a single source, including the unified report.
+# Both are globs so a layer can be built from a filtered source tree containing
+# only some crates — a glob that matches nothing is an error, which is why
+# turbotokens-adapter-common lives with the adapters: every layer includes it.
+members = ["adapters/*", "crates/*"]
+resolver = "2"
+
+# Every workspace crate inherits these, so a version or edition bump is one edit.
+[workspace.package]
+version = "1.0.0"
+edition = "2024"
+publish = false
+
+# Shared dependency specs. Crates opt in with `<dep>.workspace = true`, which keeps
+# the per-crate manifests to a list of what that crate actually uses.
+[workspace.dependencies]
+turbotokens-adapter-all = { path = "crates/turbotokens-adapter-all" }
+turbotokens-adapter-amp = { path = "adapters/amp" }
+turbotokens-adapter-claude = { path = "adapters/claude" }
+turbotokens-adapter-codebuff = { path = "adapters/codebuff" }
+turbotokens-adapter-codex = { path = "adapters/codex" }
+turbotokens-adapter-common = { path = "adapters/common" }
+turbotokens-adapter-copilot = { path = "adapters/copilot" }
+turbotokens-adapter-droid = { path = "adapters/droid" }
+turbotokens-adapter-gemini = { path = "adapters/gemini" }
+turbotokens-adapter-goose = { path = "adapters/goose" }
+turbotokens-adapter-grok = { path = "adapters/grok" }
+turbotokens-adapter-hermes = { path = "adapters/hermes" }
+turbotokens-adapter-kilo = { path = "adapters/kilo" }
+turbotokens-adapter-kimi = { path = "adapters/kimi" }
+turbotokens-adapter-openclaw = { path = "adapters/openclaw" }
+turbotokens-adapter-opencode = { path = "adapters/opencode" }
+turbotokens-adapter-pi = { path = "adapters/pi" }
+turbotokens-adapter-qwen = { path = "adapters/qwen" }
+turbotokens-cli = { path = "crates/turbotokens-cli" }
+turbotokens-cli-parser = { path = "crates/turbotokens-cli-parser" }
+turbotokens-config = { path = "crates/turbotokens-config" }
+turbotokens-core = { path = "crates/turbotokens-core" }
+turbotokens-terminal = { path = "crates/turbotokens-terminal" }
+turbotokens-test-support = { path = "crates/turbotokens-test-support" }
+assert_fs = "1"
+compact_str = "0.9"
+insta = { version = "1.47.2", features = ["json"] }
+jiff = { version = "0.2.24", default-features = false, features = [
+	"std",
+	"tz-system",
+	"tzdb-zoneinfo",
+	"tzdb-bundle-platform",
+] }
+memchr = "2"
+memmap2 = "0.9"
+mimalloc = "0.1.50"
+minreq = { version = "3.0.0-rc.1", default-features = false, features = ["https-rustls"] }
+rustc-hash = "2"
+schemars = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+smallvec = "1"
+sqlite = { version = "0.37.0", default-features = false, features = ["bundled", "linkage"] }
+terminal_size = "0.4.4"
+unicode-width = "0.2.2"
+ureq = { version = "3.3.0", default-features = false, features = ["rustls"] }
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+opt-level = 3
+panic = "abort"
+strip = "symbols"
