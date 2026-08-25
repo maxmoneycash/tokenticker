@@ -31,11 +31,11 @@ seed_file() { # file project model base_minutes
   done
 }
 
-seed_file "$DIR/projects/webapp/sess-1.jsonl"  webapp claude-sonnet-4-20250514 180
-seed_file "$DIR/projects/webapp/sess-2.jsonl"  webapp claude-sonnet-4-20250514 90
-seed_file "$DIR/projects/api/sess-1.jsonl"     api    claude-sonnet-4-20250514 150
-seed_file "$DIR/projects/api/sess-2.jsonl"     api    claude-opus-4-20250514   60
-seed_file "$DIR/projects/infra/sess-1.jsonl"   infra  claude-opus-4-20250514   45
+seed_file "$DIR/projects/webapp/sess-1.jsonl"  webapp claude-sonnet-4.6-20260416 180
+seed_file "$DIR/projects/webapp/sess-2.jsonl"  webapp claude-sonnet-4.6-20260416 90
+seed_file "$DIR/projects/api/sess-1.jsonl"     api    claude-sonnet-4.6-20260416 150
+seed_file "$DIR/projects/api/sess-2.jsonl"     api    claude-opus-4.8-20260528   60
+seed_file "$DIR/projects/infra/sess-1.jsonl"   infra  claude-opus-4.8-20260528   45
 
 echo "Seeded $DIR — point CLAUDE_CONFIG_DIR at it:"
 echo "  export CLAUDE_CONFIG_DIR=$DIR"
