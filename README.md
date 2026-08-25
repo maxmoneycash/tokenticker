@@ -2,8 +2,10 @@
 
 Real-time token and cost telemetry for AI coding agents — Claude Code, Codex, and 15 more. Single Rust binary, no runtime.
 
-[![ci](https://github.com/maxmoneycash/turbotokens/actions/workflows/ci.yml/badge.svg)](https://github.com/maxmoneycash/turbotokens/actions/workflows/ci.yml)
-[![release](https://img.shields.io/github/v/release/maxmoneycash/turbotokens)](https://github.com/maxmoneycash/turbotokens/releases)
+[![version](assets/badges/version.svg)](https://github.com/maxmoneycash/turbotokens/releases)
+[![agents](assets/badges/agents.svg)](#comparison)
+[![cold report](assets/badges/speed.svg)](#performance)
+[![built with Rust](assets/badges/rust.svg)](#development)
 
 turbotokens reads the log files your agents already write and turns them into a live dashboard, cost reports, budget alerts, and a metrics endpoint. A full report over 2.5 GB of logs takes 145 ms; a live event reaches the screen in about 100 ms.
 
@@ -26,6 +28,8 @@ turbotokens live --agent codex      # or Codex
 
 Today's tokens and cost, burn rate over the last 5 minutes, model share, active sessions, and every usage event as it lands. Not a poller: a stream.
 
+<img src="assets/live-dashboard.svg" alt="turbotokens live dashboard — today's tokens and cost, top models, active sessions, recent events" width="780">
+
 ## Reports
 
 ```bash
@@ -36,7 +40,7 @@ turbotokens blocks             # 5-hour billing windows
 turbotokens daily --watch      # auto-refresh as logs change
 ```
 
-![turbotokens daily report: date, models, input/output/cache tokens, and cost in a table](assets/daily-report.png)
+<img src="assets/daily-report.svg" alt="turbotokens daily report: date, models, input/output/cache tokens, and cost in a table" width="780">
 
 `turbotokens daemon start` runs a resident process that keeps your usage indexed in memory. Reports then answer in under a millisecond, on gigabyte datasets, while new data is still arriving — and tools that poll your usage stop melting your CPU.
 
