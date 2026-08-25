@@ -82,6 +82,23 @@ Same report, same 2.5 GB of logs, same machine (median of repeated runs; turboto
 
 That's **43–68x faster** than the most popular alternative on a cold scan and **600x+** on a warm one — and turbotokens is the only one that streams every agent's usage live with alerts and metrics built in.
 
+Warm time scales with dataset size: on a much larger 68-billion-token set spanning 9 agents, a warm full-report run is ~5 s — against 30+ minutes for the same scan with ccusage.
+
+## In production
+
+Measured swapping turbotokens into a real accounting pipeline over **68.2B tokens** of agent logs (9 agents, 68 models):
+
+| | ccusage | turbotokens |
+| --- | --- | --- |
+| Usage scan | 30+ min | **14 s** |
+| Full pipeline collection | 45+ min | **2m 13s** |
+| Tokens found | 67.4B | **68.2B** (+785M it missed) |
+
+Two correctness wins mattered more than the speed:
+
+- **No Codex double-count.** ccusage re-counts Codex's re-emitted `token_count` events — it over-reported by **10.16B tokens** on this dataset. turbotokens agrees with an independent raw-log parser to 0.0001%.
+- **Broader pricing coverage.** Models ccusage priced at $0 — including 686M tokens of k3 and 397M of grok-4.6 — come back priced, worth $16.9K of previously-invisible spend here. Reported cost lands within 2.3% of list value instead of 28% short.
+
 ## Diagnostics
 
 ```bash
