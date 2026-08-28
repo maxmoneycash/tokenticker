@@ -5,5 +5,5 @@
     <rect x="85" width="52" height="20" fill="#7aa2f7"/>
   </g>
   <text x="42.5" y="14" text-anchor="middle" fill="#a9b1d6">cold report</text>
-  <text x="111.0" y="14" text-anchor="middle" fill="#1a1b26" font-weight="bold">145 ms</text>
+  <text x="111.0" y="14" text-anchor="middle" fill="#1a1b26" font-weight="bold">170 ms</text>
 </svg>

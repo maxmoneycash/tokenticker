@@ -32,6 +32,6 @@ def badge(name, label, value, accent):
 
 os.makedirs(OUT_DIR, exist_ok=True)
 badge("version.svg", "version", "v1.0.0", "#7aa2f7")
-badge("agents.svg", "agents", "17", "#9ece6a")
-badge("speed.svg", "cold report", "145 ms", "#7aa2f7")
+badge("agents.svg", "agents", "16", "#9ece6a")
+badge("speed.svg", "cold report", "170 ms", "#7aa2f7")
 badge("rust.svg", "built with", "Rust", "#bb9af7")

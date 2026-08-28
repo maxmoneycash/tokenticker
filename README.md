@@ -1,13 +1,13 @@
 # turbotokens
 
-Real-time token and cost telemetry for AI coding agents — Claude Code, Codex, and 15 more. Single Rust binary, no runtime.
+Real-time token and cost telemetry for AI coding agents. Single Rust binary, no runtime.
 
 [![version](assets/badges/version.svg)](https://github.com/maxmoneycash/turbotokens/releases)
 [![agents](assets/badges/agents.svg)](#comparison)
 [![cold report](assets/badges/speed.svg)](#performance)
 [![built with Rust](assets/badges/rust.svg)](#development)
 
-turbotokens reads the log files your agents already write and turns them into a live dashboard, cost reports, budget alerts, and a metrics endpoint. A full report over 2.5 GB of logs takes 145 ms; a live event reaches the screen in about 100 ms.
+AI coding agents write every token they use into local JSONL logs. turbotokens reads those logs in place — nothing uploaded, no config — and turns them into cost reports, a live dashboard, budget alerts, and metrics. It supports 16 agents: Claude Code, Codex, OpenCode, Amp, Gemini, Copilot, Kimi, Grok Build, Qwen, Droid, Codebuff, Hermes, Goose, Kilo, OpenClaw, and pi-agent.
 
 <img src="assets/live-demo.gif" alt="turbotokens live dashboard — tokens, cost, burn rate, active sessions, and events streaming in real time" width="900">
 
@@ -19,74 +19,74 @@ curl -fsSL https://raw.githubusercontent.com/maxmoneycash/turbotokens/main/insta
 
 Prebuilt binaries for macOS (arm64/x64) and Linux (x64) are on the [Releases](https://github.com/maxmoneycash/turbotokens/releases) page. Or build from source: `cargo install --path rust/crates/turbotokens --features fetch-litellm-pricing`.
 
-## Live dashboard
+## Usage
 
-```bash
-turbotokens live                    # Claude Code
-turbotokens live --agent codex      # or Codex
-```
+`turbotokens` with no arguments prints a daily cost report across every agent it detects on your machine. From there, everything is a subcommand:
 
-Today's tokens and cost, burn rate over the last 5 minutes, model share, active sessions, and every usage event as it lands. Not a poller: a stream.
+| Command | What it does |
+| --- | --- |
+| `turbotokens daily` / `weekly` / `monthly` / `session` | Cost reports grouped by day, week, month, or session |
+| `turbotokens blocks` | Usage per 5-hour billing window |
+| `turbotokens claude daily` | The same reports for one agent — every agent has its own subcommand (`codex`, `opencode`, `gemini`, `grok`, …) |
+| `turbotokens live` | Real-time dashboard: today's spend, 5-minute burn rate, model share, active sessions, and every event as it lands |
+| `turbotokens live --agent codex` | Live dashboard for a different agent |
+| `turbotokens daemon start` | Resident index process — reports answer in under a millisecond from then on |
+| `turbotokens doctor` | Shows what data it sees, cache health, and pricing coverage |
 
-<img src="assets/live-dashboard.svg" alt="turbotokens live dashboard — today's tokens and cost, top models, active sessions, recent events" width="780">
-
-## Reports
-
-```bash
-turbotokens daily              # cost by day
-turbotokens weekly             # by week
-turbotokens session            # by session
-turbotokens blocks             # 5-hour billing windows
-turbotokens daily --watch      # auto-refresh as logs change
-```
+Useful flags, on every report: `--json` for piping, `--since` / `--until YYYYMMDD` for date ranges, `--breakdown` for per-model costs, `--watch` to auto-refresh as logs change.
 
 <img src="assets/daily-report.svg" alt="turbotokens daily report: date, models, input/output/cache tokens, and cost in a table" width="780">
 
-`turbotokens daemon start` runs a resident process that keeps your usage indexed in memory. Reports then answer in under a millisecond, on gigabyte datasets, while new data is still arriving — and tools that poll your usage stop melting your CPU.
+## Live dashboard
 
-## Alerts, JSON, metrics
+<img src="assets/live-dashboard.svg" alt="turbotokens live dashboard — today's tokens and cost, top models, active sessions, recent events" width="780">
+
+`turbotokens live` watches the log files directly — new usage hits the screen about 100 ms after the agent writes it. It's also the integration point:
 
 ```bash
-# Stream every event as JSON — pipe it anywhere
+# Stream every event as JSON
 turbotokens live --json | jq -r 'select(.type=="usage") | .cost'
 
-# Get pinged when today gets expensive
+# Webhook alert when today gets expensive
 turbotokens live --alert-cost 25 --webhook https://hooks.slack.com/...
 
-# Feed Grafana or any Prometheus setup
+# Prometheus metrics for Grafana
 turbotokens live --serve 127.0.0.1:9090
 ```
 
 ## Performance
 
-Measured on a real 2.5 GB / 1,641-file dataset, median of 10+ runs, byte-identical output ([reproduce](rust/bench)):
+Measured on a real 2.3 GB / 1,648-file Claude Code dataset, median of repeated runs, byte-identical output ([reproduce](rust/bench)):
 
-| | |
-| --- | --- |
-| Full report, cold scan (no cache) | **145 ms** |
-| Same report on an unchanged dataset | **10 ms** |
-| Report served by the daemon | **< 1 ms** |
-| Live event latency (log write → on screen) | **p95 ≈ 110 ms** |
-| Agents supported | **17** |
+| Report | First run (no cache) | Cached |
+| --- | --- | --- |
+| `claude daily` | **170 ms** | **10 ms** |
+| `daily` (all 16 agents) | 5.9 s | 5.4 s |
+| Any report served by the daemon | **< 1 ms** | — |
+| Live event latency (log write → on screen) | p95 ≈ 110 ms | — |
+
+The parse cache covers Claude Code logs; multi-agent scans also re-read the other agents' logs, which is why the all-agent report takes longer. `turbotokens daemon start` removes that too — it holds the index in memory and answers everything in under a millisecond.
 
 ## Comparison
 
-Same report, same 2.5 GB of logs, same machine (median of repeated runs; turbotokens cold = cache disabled, the worst case):
+Same report, same 2.3 GB of Claude Code logs, same machine. turbotokens cold = cache disabled, the worst case:
 
-| | turbotokens | ccusage | claude-code-usage-monitor | Menu-bar apps (SessionWatcher, Pacer) |
+| | turbotokens | ccusage |
+| --- | --- | --- |
+| Full cost report, first run | **170 ms** | 6.2–9.9 s (**36–58x** slower) |
+| Same report again | **10 ms** | re-parses every file, every run |
+| Codex token accuracy | matches an independent raw-log parser to 0.0001% | double-counts Codex `token_count` events (+10.16B tokens over-reported on a 68B-token dataset) |
+
+Capabilities, broader field:
+
+| | turbotokens | ccusage | claude-code-usage-monitor | Menu-bar apps |
 | --- | --- | --- | --- | --- |
-| What it is | Single Rust binary | TypeScript CLI (Node/Bun) | Python CLI | Native macOS apps |
-| Full usage report | **145 ms** | 6.2–9.9 s | — | — |
-| Repeat on unchanged data | **10 ms** (parse + report cache) | Re-parses every file, every run | — | — |
+| Agents covered | **16** | ~16 | 1 | 1–2 |
 | Real-time event stream | Yes, ~110 ms latency | Active-block monitor only | Yes, Claude only | Yes |
-| Agents covered | **17** | ~16 | 1 | 1–2 |
 | Budget alerts / webhooks | Yes | No | No | Notifications only |
-| Prometheus / metrics endpoint | Yes | No | No | No |
+| Prometheus endpoint | Yes | No | No | No |
 | Pipeable JSON everywhere | Yes | Yes | No | No |
-
-That's **43–68x faster** than the most popular alternative on a cold scan and **600x+** on a warm one — and turbotokens is the only one that streams every agent's usage live with alerts and metrics built in.
-
-Warm time scales with dataset size: on a much larger 68-billion-token set spanning 9 agents, a warm full-report run is ~5 s — against 30+ minutes for the same scan with ccusage.
+| Resident daemon | Yes | No | No | No |
 
 ## In production
 
@@ -98,20 +98,20 @@ Measured swapping turbotokens into a real accounting pipeline over **68.2B token
 | Full pipeline collection | 45+ min | **2m 13s** |
 | Tokens found | 67.4B | **68.2B** (+785M it missed) |
 
-Two correctness wins mattered more than the speed:
-
-- **No Codex double-count.** ccusage re-counts Codex's re-emitted `token_count` events — it over-reported by **10.16B tokens** on this dataset. turbotokens agrees with an independent raw-log parser to 0.0001%.
-- **Broader pricing coverage.** Models ccusage priced at $0 — including 686M tokens of k3 and 397M of grok-4.6 — come back priced, worth $16.9K of previously-invisible spend here. Reported cost lands within 2.3% of list value instead of 28% short.
+Pricing coverage mattered as much as speed: models ccusage priced at $0 — including 686M tokens of k3 and 397M of grok-4.6 — come back priced, $16.9K of previously-invisible spend on this dataset. Reported cost lands within 2.3% of list value instead of 28% short.
 
 ## Diagnostics
+
+Real `turbotokens doctor` output on a working machine:
 
 ```bash
 $ turbotokens doctor
 ✓ version: 1.0.0
-✓ claude data: ~/.claude (1,084 JSONL files, 2.1 GB)
-✓ codex data: ~/.codex/sessions (557 JSONL files, 0.4 GB)
-✓ parse cache: 5,946 entries, 99.8 MB
-✓ embedded pricing: loadable (460 models)
+✓ claude data: ~/.claude (1648 JSONL files, 2.3 GB)
+✓ codex data: ~/.codex/sessions (2179 JSONL files)
+✓ other agents: 3 other agents detected (opencode, gemini, grok)
+✓ parse cache: 3307 entries, 58.5 MB
+✓ embedded pricing: loadable (468 models)
 ```
 
 One command tells you what turbotokens sees, what's healthy, and what to fix. Shell completions included: `turbotokens completions zsh`.

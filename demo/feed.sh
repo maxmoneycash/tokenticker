@@ -13,8 +13,8 @@ sessions="sess-1 sess-2"
 
 pick_model() {
   case $((RANDOM % 6)) in
-    0|1) echo "claude-opus-4.8-20260528" ;;
-    *)   echo "claude-sonnet-4.6-20260416" ;;
+    0|1) echo "claude-fable-5" ;;
+    *)   echo "claude-opus-5" ;;
   esac
 }
 
