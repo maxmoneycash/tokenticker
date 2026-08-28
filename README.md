@@ -9,7 +9,7 @@ Real-time token and cost telemetry for AI coding agents. Single Rust binary, no 
 
 AI coding agents write every token they use into local JSONL logs. turbotokens reads those logs in place — nothing uploaded, no config — and turns them into cost reports, a live dashboard, budget alerts, and metrics. It supports 16 agents: Claude Code, Codex, OpenCode, Amp, Gemini, Copilot, Kimi, Grok Build, Qwen, Droid, Codebuff, Hermes, Goose, Kilo, OpenClaw, and pi-agent.
 
-<img src="assets/live-demo.gif" alt="turbotokens live dashboard — tokens, cost, burn rate, active sessions, and events streaming in real time" width="900">
+<img src="assets/live-dashboard.png" alt="turbotokens live dashboard — tokens, cost, burn rate, active sessions, and events streaming in real time" width="900">
 
 ## Install
 
@@ -35,11 +35,9 @@ Prebuilt binaries for macOS (arm64/x64) and Linux (x64) are on the [Releases](ht
 
 Useful flags, on every report: `--json` for piping, `--since` / `--until YYYYMMDD` for date ranges, `--breakdown` for per-model costs, `--watch` to auto-refresh as logs change.
 
-<img src="assets/daily-report.svg" alt="turbotokens daily report: date, models, input/output/cache tokens, and cost in a table" width="780">
+<img src="assets/daily-report.png" alt="turbotokens daily report: date, models, input/output/cache tokens, and cost in a table" width="900">
 
 ## Live dashboard
-
-<img src="assets/live-dashboard.svg" alt="turbotokens live dashboard — today's tokens and cost, top models, active sessions, recent events" width="780">
 
 `turbotokens live` watches the log files directly — new usage hits the screen about 100 ms after the agent writes it. It's also the integration point:
 

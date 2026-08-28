@@ -4,9 +4,10 @@ import os
 
 OUT_DIR = "assets/badges"
 FONT_STACK = "Menlo, 'SF Mono', 'Cascadia Code', Consolas, monospace"
-LABEL_BG = "#24283b"
-LABEL_FG = "#a9b1d6"
-VALUE_FG = "#1a1b26"
+LABEL_BG = "#f6f8fa"
+LABEL_FG = "#57606a"
+VALUE_FG = "#ffffff"
+BORDER = "#d0d7de"
 H, FS, PAD = 20, 11, 6
 CW = FS * 0.6  # Menlo advance
 
@@ -21,6 +22,7 @@ def badge(name, label, value, accent):
     <rect width="{lw}" height="{H}" fill="{LABEL_BG}"/>
     <rect x="{lw}" width="{vw}" height="{H}" fill="{accent}"/>
   </g>
+  <rect x="0.5" y="0.5" width="{w - 1}" height="{H - 1}" rx="3" fill="none" stroke="{BORDER}"/>
   <text x="{lw / 2:.1f}" y="{y}" text-anchor="middle" fill="{LABEL_FG}">{label}</text>
   <text x="{lw + vw / 2:.1f}" y="{y}" text-anchor="middle" fill="{VALUE_FG}" font-weight="bold">{value}</text>
 </svg>
@@ -31,7 +33,7 @@ def badge(name, label, value, accent):
     print(f"wrote {path} {w}x{H}")
 
 os.makedirs(OUT_DIR, exist_ok=True)
-badge("version.svg", "version", "v1.0.0", "#7aa2f7")
-badge("agents.svg", "agents", "16", "#9ece6a")
-badge("speed.svg", "cold report", "170 ms", "#7aa2f7")
-badge("rust.svg", "built with", "Rust", "#bb9af7")
+badge("version.svg", "version", "v1.0.0", "#0969da")
+badge("agents.svg", "agents", "16", "#1a7f37")
+badge("speed.svg", "cold report", "170 ms", "#0969da")
+badge("rust.svg", "built with", "Rust", "#8250df")

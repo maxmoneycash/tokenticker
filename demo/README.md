@@ -28,24 +28,30 @@ run 10-15s before the live segment so the burn rate is non-zero.
 
 ## Regenerating the README images
 
-The images in `assets/` are rendered from real terminal captures, not mockups:
+The images in `assets/` are real terminal captures, framed with
+[freeze](https://github.com/charmbracelet/freeze) (macOS window chrome,
+rounded corners, xcode light theme). Pipeline:
 
 ```bash
 demo/seed.sh
-(CLAUDE_CONFIG_DIR=/tmp/turbotokens-demo demo/feed.sh &)   # keep data flowing
+(env -u NO_COLOR CLAUDE_CONFIG_DIR=/tmp/turbotokens-demo demo/feed.sh &)
 
-# record a live session, then render the final frame
+# record the live dashboard and the daily report (colors need
+# `env -u NO_COLOR` if your shell sets NO_COLOR)
 asciinema rec --overwrite -q --cols 100 --rows 32 \
-  -c 'sh -c "CLAUDE_CONFIG_DIR=/tmp/turbotokens-demo turbotokens live --offline & p=$!; sleep 12; kill $p"' \
+  -c 'sh -c "env -u NO_COLOR TERM=xterm-256color CLAUDE_CONFIG_DIR=/tmp/turbotokens-demo turbotokens live --offline & p=$!; sleep 12; kill $p"' \
   /tmp/tt-live.cast
-python3 demo/render_svg.py /tmp/tt-live.cast assets/live-dashboard.svg 100 32 15
-python3 demo/render_cast.py /tmp/tt-live.cast assets/live-dashboard.png 100 32 30
-
-# daily report
 asciinema rec --overwrite -q --cols 100 --rows 40 \
-  -c 'env CLAUDE_CONFIG_DIR=/tmp/turbotokens-demo turbotokens claude daily --offline' \
+  -c 'env -u NO_COLOR TERM=xterm-256color CLAUDE_CONFIG_DIR=/tmp/turbotokens-demo turbotokens claude daily --offline' \
   /tmp/tt-daily.cast
-python3 demo/render_svg.py /tmp/tt-daily.cast assets/daily-report.svg 100 40 15 trim
+
+# final cast frame -> ANSI -> freeze
+python3 demo/cast_to_ansi.py /tmp/tt-live.cast 100 32 | \
+  freeze --window --theme xcode --language ansi --font.size 14 \
+    --border.radius 10 --margin 24 -o assets/live-dashboard.png
+python3 demo/cast_to_ansi.py /tmp/tt-daily.cast 100 40 | \
+  freeze --window --theme xcode --language ansi --font.size 14 \
+    --border.radius 10 --margin 24 -o assets/daily-report.png
 
 # social card + animated demo + badges
 python3 demo/social_card.py        # composites the dashboard PNG, 1280x640
@@ -53,7 +59,12 @@ agg --font-size 16 --speed 1.2 /tmp/tt-live.cast assets/live-demo.gif
 python3 demo/badges.py             # rewrites assets/badges/*.svg
 ```
 
-`render_svg.py` needs `pyte`; `render_cast.py`/`social_card.py` also need
-`Pillow` (a venv works fine). Font: Menlo. The SVG renderer draws box-drawing
-characters as vectors and pins every word to the terminal grid with
-`textLength`, so tables stay aligned in any browser.
+`cast_to_ansi.py` needs `pyte`, `social_card.py` needs `Pillow` (a venv
+works fine). freeze is a single static binary from GitHub releases.
+`cast_to_ansi.py` remaps ANSI yellow to an olive truecolor — the stock
+light themes render it unreadably pale.
+
+There are also two homegrown renderers kept for reference:
+`render_svg.py` (cast → flat SVG, vector box-drawing, grid-pinned text)
+and `render_cast.py` (cast → PNG via Pillow). The README images use the
+freeze pipeline above.

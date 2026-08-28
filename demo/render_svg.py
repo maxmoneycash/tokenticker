@@ -18,7 +18,7 @@ BG = "#1a1b26"
 FG = "#c0caf5"
 BASE16 = {
     "black": "#151724", "red": "#f7768e", "green": "#9ece6a",
-    "yellow": "#e0af68", "blue": "#7aa2f7", "magenta": "#bb9af7",
+    "yellow": "#e0af68", "brown": "#e0af68", "blue": "#7aa2f7", "magenta": "#bb9af7",
     "cyan": "#7dcfff", "white": "#a9b1d6",
     "brightblack": "#414868", "brightred": "#f7768e",
     "brightgreen": "#9ece6a", "brightyellow": "#e0af68",
