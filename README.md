@@ -75,16 +75,21 @@ Same report, same 2.3 GB of Claude Code logs, same machine. turbotokens cold = c
 | Same report again | **10 ms** | re-parses every file, every run |
 | Codex token accuracy | matches an independent raw-log parser to 0.0001% | double-counts Codex `token_count` events (+10.16B tokens over-reported on a 68B-token dataset) |
 
-Capabilities, broader field:
+Capabilities, broader field ([tokscale](https://github.com/junhoyeo/tokscale) and [token-monitor](https://github.com/Javis603/token-monitor) are the other substantial multi-agent tools):
 
-| | turbotokens | ccusage | claude-code-usage-monitor | Menu-bar apps |
-| --- | --- | --- | --- | --- |
-| Agents covered | **16** | ~16 | 1 | 1–2 |
-| Real-time event stream | Yes, ~110 ms latency | Active-block monitor only | Yes, Claude only | Yes |
-| Budget alerts / webhooks | Yes | No | No | Notifications only |
-| Prometheus endpoint | Yes | No | No | No |
-| Pipeable JSON everywhere | Yes | Yes | No | No |
-| Resident daemon | Yes | No | No | No |
+| | turbotokens | tokscale | token-monitor | ccusage | claude-code-usage-monitor | Menu-bar apps |
+| --- | --- | --- | --- | --- | --- | --- |
+| What it is | Single Rust binary | Rust CLI + TUI | Desktop widget (JS) | TypeScript CLI | Python CLI | Native macOS apps |
+| Agents covered | 16 | 45+ | 32+ | ~16 | 1 | 1–2 |
+| Interactive dashboard | Live terminal TUI | Ratatui TUI | Desktop widget | No | Terminal monitor | Yes |
+| Real-time event stream | Yes, ~110 ms latency | No | Yes, live widget | Active-block monitor only | Yes, Claude only | Yes |
+| Budget alerts / webhooks | Yes | No | Plan-limit tracking | No | Limit warnings | Notifications only |
+| Prometheus endpoint | Yes | No | No | No | No | No |
+| Pipeable JSON | Yes | Yes | — | Yes | No | No |
+| Resident daemon (<1 ms reports) | Yes | No | No | No | No | No |
+| Your data leaves the machine | Never | Optional public leaderboards | Optional device sync | No | No | No |
+
+tokscale is the closest peer — Rust core, the broadest agent coverage, and a social leaderboard (which means uploading your usage if you opt in). token-monitor is a different niche: an always-on desktop widget that also tracks provider plan limits. turbotokens' niche is scripted reporting and integration: the fastest cold/warm reports, a real event stream, and alerts/metrics/JSON that plug into anything.
 
 ## In production
 
