@@ -21,7 +21,7 @@ AI coding agents write every token they use into local JSONL logs. turbotokens r
 
 All three counted byte-identical token totals at every size — same count, very different wait ([harness](rust/bench/scaling-bench.sh), median of repeated runs; tokscale cold runs include its one-time pricing download). On real log folders — thousands of small files, not six big ones — the gap is much wider: ccusage re-parses everything on every run, so a real 2.3 GB / 1,648-file folder takes it 6–8.5 s where turbotokens answers in 170 ms cold and 10 ms warm, and a 68.2B-token production pipeline scan took 14 s vs 30+ minutes.
 
-<img src="assets/scaling-chart.png" alt="Scaling chart: wall time vs tokens counted, log scale. turbotokens 53 ms at 1B tokens rising to 1.2 s at 50B; ccusage 489 ms rising to 3.2 s" width="900">
+<img src="assets/scaling-chart.png" alt="Two-panel chart. Left: bulk scaling — turbotokens 53 ms at 1B tokens to 1.2 s at 50B, ccusage 489 ms to 3.2 s, tokscale 3.0 s to 11.6 s. Right: real workloads — real 2.3 GB folder 170 ms vs 7 s, repeat run 10 ms vs 7 s, daemon <1 ms vs no equivalent, 68B-token production scan 14 s vs 30+ min" width="1100">
 
 <img src="assets/live-dashboard.png" alt="turbotokens live dashboard — tokens, cost, burn rate, active sessions, and events streaming in real time" width="900">
 
