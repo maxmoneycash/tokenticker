@@ -9,9 +9,19 @@ Real-time token and cost telemetry for AI coding agents. Single Rust binary, no 
 
 AI coding agents write every token they use into local JSONL logs. turbotokens reads those logs in place — nothing uploaded, no config — and turns them into cost reports, a live dashboard, budget alerts, and metrics. It supports 16 agents: Claude Code, Codex, OpenCode, Amp, Gemini, Copilot, Kimi, Grok Build, Qwen, Droid, Codebuff, Hermes, Goose, Kilo, OpenClaw, and pi-agent.
 
-**Counting 68.2B tokens of real agent logs takes turbotokens 14 seconds. ccusage needs 30+ minutes for the same count.** A single Claude Code report (2.3 GB of logs) answers in 170 ms cold, 10 ms warm.
+**Time to count N tokens — full cost report, no cache, identical logs for all three tools:**
 
-<img src="assets/speed-chart.png" alt="Timing comparison: turbotokens counts 68.2B tokens in 14 s vs ccusage 30+ min; single-agent report 10 ms warm / 170 ms cold vs 6.2–9.9 s" width="900">
+| Tokens counted | On disk | turbotokens | ccusage | tokscale |
+| --- | --- | --- | --- | --- |
+| 1B | 69 MB | **53 ms** | 489 ms | 2.96 s |
+| 5B | 347 MB | **141 ms** | 673 ms | 3.41 s |
+| 10B | 769 MB | **255 ms** | 927 ms | 4.20 s |
+| 25B | 1.7 GB | **571 ms** | 1.66 s | 5.61 s |
+| 50B | 3.4 GB | **1.22 s** | 3.20 s | 11.6 s |
+
+All three counted byte-identical token totals at every size — same count, very different wait ([harness](rust/bench/scaling-bench.sh), median of repeated runs; tokscale cold runs include its one-time pricing download). On real log folders — thousands of small files, not six big ones — the gap is much wider: ccusage re-parses everything on every run, so a real 2.3 GB / 1,648-file folder takes it 6–8.5 s where turbotokens answers in 170 ms cold and 10 ms warm, and a 68.2B-token production pipeline scan took 14 s vs 30+ minutes.
+
+<img src="assets/scaling-chart.png" alt="Scaling chart: wall time vs tokens counted, log scale. turbotokens 53 ms at 1B tokens rising to 1.2 s at 50B; ccusage 489 ms rising to 3.2 s" width="900">
 
 <img src="assets/live-dashboard.png" alt="turbotokens live dashboard — tokens, cost, burn rate, active sessions, and events streaming in real time" width="900">
 
@@ -75,7 +85,7 @@ Same report, same 2.3 GB of Claude Code logs, same machine. turbotokens cold = c
 
 | | turbotokens | ccusage |
 | --- | --- | --- |
-| Full cost report, first run | **170 ms** | 6.2–9.9 s (**36–58x** slower) |
+| Full cost report, first run | **170 ms** | 6–8.5 s (**34–49x** slower) |
 | Same report again | **10 ms** | re-parses every file, every run |
 | Codex token accuracy | matches an independent raw-log parser to 0.0001% | double-counts Codex `token_count` events (+10.16B tokens over-reported on a 68B-token dataset) |
 

@@ -13,8 +13,11 @@ the binary is the product.
 - `rust/adapters/<agent>` — per-agent log loaders; `claude` is the largest and
   owns the parse cache (`cache.rs`), the daily fast path (`daily.rs`), and the
   real-time telemetry stream (`live.rs`)
-- `rust/bench` — `warm-bench.sh` (cache speedup + parity) and
-  `latency-probe.sh` (live-mode latency)
+- `rust/bench` — `warm-bench.sh` (cache speedup + parity),
+  `latency-probe.sh` (live-mode latency), and the token-scaling benchmark:
+  `gen_scaling_data.py` (synthetic Claude-format datasets, 1B-50B tokens),
+  `scaling-bench.sh` (turbotokens vs ccusage timing + parity check),
+  `plot_scaling.py` (matplotlib chart)
 
 ## Commands
 
