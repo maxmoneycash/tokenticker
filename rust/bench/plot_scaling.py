@@ -59,7 +59,7 @@ ax.set_xscale("log")
 ax.set_xlim(0.03, 40)
 ax.set_xticks([0.01, 0.1, 1, 10])
 ax.set_xticklabels(["10 ms", "100 ms", "1 second", "10 seconds"], fontsize=11.5)
-ax.set_xlabel("Time to finish (log scale) — lower is better")
+ax.set_xlabel("Time to finish (log scale)")
 ax.set_title("How long it takes to count N tokens", fontsize=17,
              fontweight="bold", loc="left", pad=32)
 ax.text(0.0, 1.035, "full cost report · identical logs for every tool · no cache",
