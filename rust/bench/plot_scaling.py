@@ -1,116 +1,100 @@
 #!/usr/bin/env python3
-"""Render assets/scaling-chart.png — two panels:
+"""Render assets/scaling-chart.png — one organized grouped-bar chart.
 
-Left:  bulk scaling lines from the scaling-bench results CSV
-       (time to count N tokens, single shot, no cache).
-Right: real-world workloads where architecture dominates — real log folder,
-       repeat runs, daemon, production pipeline (all measured).
-
+Sections: synthetic scaling series (1B-50B, from scaling-bench results CSV),
+then real-world runs (real folder, repeat, daemon, production pipeline).
 Usage: plot_scaling.py results.csv out.png
 """
 import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 csv_path, out_path = sys.argv[1], sys.argv[2]
 
-series = {}
+syn = {}
 for line in open(csv_path):
     if line.startswith("tool"):
         continue
     tool, tokens, _b, secs = line.strip().split(",")
-    series.setdefault(tool, []).append((int(tokens) / 1e9, float(secs)))
+    syn[(tool, int(tokens) // 1_000_000_000)] = float(secs)
 
-STYLE = {
-    "turbotokens": {"color": "#1a7f37", "marker": "o", "label": "turbotokens"},
-    "ccusage": {"color": "#cf222e", "marker": "^", "label": "ccusage"},
-    "tokscale": {"color": "#0969da", "marker": "s", "label": "tokscale"},
-}
-GREEN, RED, GRAY = "#1a7f37", "#cf222e", "#57606a"
+GREEN, RED, BLUE, GRAY = "#1a7f37", "#cf222e", "#0969da", "#57606a"
+
+def fmt(s):
+    if s <= 0.001:
+        return "<1 ms"
+    if s < 1:
+        return f"{s*1000:.0f} ms"
+    return f"{s:.1f} s" if s < 60 else f"{s/60:.0f}+ min"
+
+# (kind, label, {tool: seconds or None}, note)
+# kind: "header" or "bars"
+ROWS = [
+    ("header", "Real logs & production", {}, ""),
+    ("bars", "68.2B-token pipeline · 9 agents", {"turbotokens": 14.0, "ccusage": 1800.0}, ""),
+    ("bars", "Real folder, 2.3 GB · first run", {"turbotokens": 0.170, "ccusage": 7.0}, ""),
+    ("bars", "Same folder · repeat run", {"turbotokens": 0.010, "ccusage": 7.0}, ""),
+    ("bars", "Same folder · via daemon", {"turbotokens": 0.001, "ccusage": None}, "ccusage: no daemon, full re-parse"),
+    ("header", "Synthetic logs, identical for all tools", {}, ""),
+    ("bars", "50B tokens", {"turbotokens": syn[("turbotokens", 50)], "ccusage": syn[("ccusage", 50)], "tokscale": syn[("tokscale", 50)]}, ""),
+    ("bars", "25B tokens", {"turbotokens": syn[("turbotokens", 25)], "ccusage": syn[("ccusage", 25)], "tokscale": syn[("tokscale", 25)]}, ""),
+    ("bars", "10B tokens", {"turbotokens": syn[("turbotokens", 10)], "ccusage": syn[("ccusage", 10)], "tokscale": syn[("tokscale", 10)]}, ""),
+    ("bars", "1B tokens", {"turbotokens": syn[("turbotokens", 1)], "ccusage": syn[("ccusage", 1)], "tokscale": syn[("tokscale", 1)]}, ""),
+]
+
+TOOLS = [("turbotokens", GREEN), ("ccusage", RED), ("tokscale", BLUE)]
 
 plt.rcParams.update({
     "font.family": "Menlo", "figure.facecolor": "white", "axes.facecolor": "white",
     "axes.edgecolor": "#d0d7de", "axes.grid": True, "grid.color": "#e5e7eb",
-    "grid.linewidth": 0.8, "font.size": 12.5,
+    "grid.linewidth": 0.8, "font.size": 12,
 })
 
-fig, (axl, axr) = plt.subplots(
-    1, 2, figsize=(15.5, 6.4), dpi=150,
-    gridspec_kw={"width_ratios": [1.15, 1.0], "wspace": 0.16},
-)
+fig, ax = plt.subplots(figsize=(11.5, 6.8), dpi=150)
 
-# ---------------- left: bulk scaling ----------------
-for tool, pts in series.items():
-    pts.sort()
-    xs = [p[0] for p in pts]
-    ys = [p[1] for p in pts]
-    st = STYLE.get(tool, {"color": GRAY, "marker": "o", "label": tool})
-    axl.plot(xs, ys, marker=st["marker"], color=st["color"], linewidth=2.5,
-             markersize=8, label=st["label"])
-    for i, (x, y) in enumerate(zip(xs, ys)):
-        label = f"{y*1000:.0f} ms" if y < 1 else f"{y:.1f} s"
-        offset = (8, -16) if i == 0 else (8, 8)
-        axl.annotate(label, (x, y), textcoords="offset points", xytext=offset,
-                     color=st["color"], fontsize=10.5, fontweight="bold")
+BAR_H, GAP = 0.22, 0.05
+y = 0.0
+y_ticks, y_labels = [], []
+for kind, label, data, note in ROWS:
+    if kind == "header":
+        ax.text(9e-4, y, label, fontsize=12.5, fontweight="bold", color=GRAY,
+                va="center")
+        y -= 0.55
+        continue
+    y_ticks.append(y)
+    y_labels.append(label)
+    present = [(t, c) for t, c in TOOLS if t in data]
+    for i, (tool, color) in enumerate(present):
+        secs = data[tool]
+        yy = y + (len(present) - 1 - i) * (BAR_H + GAP) - (len(present) * (BAR_H + GAP)) / 2 + BAR_H / 2
+        if secs is None:
+            ax.barh(yy, 7.0, height=BAR_H, color=color, alpha=0.22)
+            ax.annotate(note, (7.0, yy), textcoords="offset points",
+                        xytext=(6, -3), color=color, fontsize=10, style="italic")
+        else:
+            ax.barh(yy, secs, height=BAR_H, color=color)
+            ax.annotate(fmt(secs), (secs, yy), textcoords="offset points",
+                        xytext=(5, -3), color=color, fontsize=10.5, fontweight="bold")
+    y -= 1.0
 
-axl.set_yscale("log")
-axl.set_xlabel("Tokens counted (billions)")
-axl.set_ylabel("Wall time (log scale)")
-axl.set_title("One giant report, once — synthetic logs", fontsize=14, pad=12)
-axl.legend(frameon=False, loc="upper left")
-axl.spines[["top", "right"]].set_visible(False)
+ax.set_yticks(y_ticks)
+ax.set_yticklabels(y_labels, fontsize=11.5)
+ax.set_xscale("log")
+ax.set_xlim(8e-4, 5000)
+ax.set_xticks([0.001, 0.01, 0.1, 1, 10, 60, 600, 3600])
+ax.set_xticklabels(["1 ms", "10 ms", "100 ms", "1 s", "10 s", "1 min", "10 min", "1 h"],
+                   fontsize=10.5)
+ax.set_xlabel("Wall time, log scale — lower is better")
+ax.set_title("Time for a full token-usage report", fontsize=15, pad=34)
+ax.text(0.0, 1.045, "median of measured runs · identical logs for all tools · cache disabled",
+        transform=ax.transAxes, fontsize=10.5, color=GRAY)
+ax.legend(handles=[mpatches.Patch(color=c, label=t) for t, c in TOOLS],
+          frameon=False, loc="lower right", fontsize=11)
+ax.spines[["top", "right"]].set_visible(False)
+ax.grid(axis="y", visible=False)
 
-# ---------------- right: real-world workloads ----------------
-# (label, turbotokens s, ccusage s or None, ccusage note)
-ROWS = [
-    ("Real folder, 2.3 GB / 1,648 files\nfirst run", 0.170, 7.0, None),
-    ("Same folder, nothing changed\nrepeat run", 0.010, 7.0, "re-parses everything"),
-    ("Same folder, daemon-served", 0.001, None, "no daemon — full re-parse"),
-    ("68.2B-token production scan\n9 agents, real pipeline", 14.0, 1800.0, None),
-]
-
-def fmt(s):
-    if s < 0.01:
-        return "<1 ms" if s <= 0.001 else f"{s*1000:.0f} ms"
-    if s < 1:
-        return f"{s*1000:.0f} ms"
-    return f"{s:.0f} s" if s < 60 else f"{s/60:.0f}+ min"
-
-y_pos = list(range(len(ROWS)))[::-1]
-for (label, tt, cc, note), y in zip(ROWS, y_pos):
-    axr.barh(y + 0.19, tt, height=0.34, color=GREEN)
-    axr.annotate(fmt(tt), (tt, y + 0.19), textcoords="offset points",
-                 xytext=(6, -3), color=GREEN, fontsize=11, fontweight="bold")
-    if cc is not None:
-        axr.barh(y - 0.19, cc, height=0.34, color=RED)
-        txt = fmt(cc) + (f"  ({note})" if note else "")
-        axr.annotate(txt, (cc, y - 0.19), textcoords="offset points",
-                     xytext=(6, -3), color=RED, fontsize=11, fontweight="bold")
-    else:
-        axr.barh(y - 0.19, 7.0, height=0.34, color="#cf222e", alpha=0.25)
-        axr.annotate(note, (7.0, y - 0.19), textcoords="offset points",
-                     xytext=(6, -3), color=RED, fontsize=10.5, style="italic")
-
-axr.set_yticks(y_pos)
-axr.set_yticklabels([r[0] for r in ROWS], fontsize=11)
-axr.set_xscale("log")
-axr.set_xlim(8e-4, 8000)
-axr.set_xlabel("Wall time (log scale)")
-axr.set_title("The workloads you actually have", fontsize=14, pad=12)
-axr.spines[["top", "right"]].set_visible(False)
-axr.grid(axis="y", visible=False)
-axr.set_xticks([0.001, 0.01, 0.1, 1, 10, 60, 600, 3600])
-axr.set_xticklabels(["1 ms", "10 ms", "100 ms", "1 s", "10 s", "1 min", "10 min", "1 h"],
-                    fontsize=10.5)
-
-import matplotlib.patches as mpatches
-axr.legend(handles=[mpatches.Patch(color=GREEN, label="turbotokens"),
-                    mpatches.Patch(color=RED, label="ccusage")],
-           frameon=False, loc="upper right", bbox_to_anchor=(0.99, 0.90))
-
-fig.suptitle("Time to count N tokens — full cost report, no cache, identical logs (all measured)",
-             fontsize=15, y=0.98)
-fig.subplots_adjust(left=0.07, right=0.99, bottom=0.12, top=0.86)
+fig.tight_layout()
 fig.savefig(out_path)
 print(f"wrote {out_path}")
