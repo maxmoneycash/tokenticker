@@ -89,6 +89,8 @@ Same report, same 2.3 GB of Claude Code logs, same machine. turbotokens cold = c
 | Same report again | **10 ms** | re-parses every file, every run |
 | Codex token accuracy | matches an independent raw-log parser to 0.0001% | double-counts Codex `token_count` events (+10.16B tokens over-reported on a 68B-token dataset) |
 
+<img src="assets/speed-chart.png" alt="Real-world timing: real 2.3 GB log folder — turbotokens 170 ms cold / 10 ms warm vs ccusage 6–8.5 s; 68.2B-token production scan — 14 s vs 30+ min" width="900">
+
 Capabilities, broader field ([tokscale](https://github.com/junhoyeo/tokscale) and [token-monitor](https://github.com/Javis603/token-monitor) are the other substantial multi-agent tools):
 
 | | turbotokens | tokscale | token-monitor | ccusage | claude-code-usage-monitor | Menu-bar apps |
