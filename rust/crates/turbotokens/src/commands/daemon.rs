@@ -21,7 +21,7 @@ pub(crate) fn run(args: DaemonArgs) -> Result<()> {
     {
         let _ = args;
         Err(cli_error(
-            "turbotokens daemon requires a unix socket platform",
+            "turbotokens daemon mode is not supported on Windows yet",
         ))
     }
 }

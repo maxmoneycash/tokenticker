@@ -49,10 +49,7 @@ fn is_program_name(arg: &str) -> bool {
         .rsplit('\\')
         .next()
         .unwrap_or(arg);
-    matches!(
-        name,
-        "turbotokens" | "turbotokens.exe" | "turbotokens" | "turbotokens.exe"
-    )
+    matches!(name, "turbotokens" | "turbotokens.exe")
 }
 
 fn help_text_for_tokens(tokens: &[String]) -> String {

@@ -306,7 +306,7 @@ mod tests {
         assert!((cost - 3.0451).abs() < 1e-9, "long-context cost was {cost}");
 
         // Below the threshold every bucket stays on the short-context rates:
-        // 0.5 + 0.03 + 0.00005.
+        // 0.4 + 0.02 + 0.00004.
         let short = TokenUsageRaw {
             input_tokens: 100_000,
             output_tokens: 1_000,
@@ -321,7 +321,7 @@ mod tests {
             Some(&pricing),
         );
         assert!(
-            (cost - 0.53005).abs() < 1e-9,
+            (cost - 0.42004).abs() < 1e-9,
             "short-context cost was {cost}"
         );
     }

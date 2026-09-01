@@ -2,11 +2,17 @@
 //! with the server (`daemon.rs`). Everything here fails soft: any error,
 //! missing socket, or incompatible daemon falls back to the normal load path.
 
-use std::{collections::BTreeMap, time::Duration};
+#[cfg(unix)]
+use std::time::Duration;
+#[cfg(any(unix, test))]
+use std::collections::BTreeMap;
 
+#[cfg(any(unix, test))]
 use serde::{Deserialize, Serialize};
+#[cfg(any(unix, test))]
 use serde_json::{Map, Value};
 
+#[cfg(any(unix, test))]
 use turbotokens_cli::PricingOverride;
 
 use crate::{UsageSummary, cli::SharedArgs};
@@ -14,6 +20,7 @@ use crate::{UsageSummary, cli::SharedArgs};
 /// Reads may legitimately wait behind an in-flight query or poll; anything
 /// longer means the daemon is wedged and the caller should fall back to
 /// loading directly.
+#[cfg(unix)]
 pub(crate) const DAEMON_READ_TIMEOUT: Duration = Duration::from_millis(200);
 
 /// Serves daily rows from the resident daemon when one is running with
@@ -98,6 +105,7 @@ pub(crate) fn request_response(
     Ok(serde_json::from_str(&line)?)
 }
 
+#[cfg(any(unix, test))]
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct DaemonRequest {
     pub(crate) command: String,
@@ -107,6 +115,7 @@ pub(crate) struct DaemonRequest {
     pub(crate) group_by_project: bool,
 }
 
+#[cfg(any(unix, test))]
 impl DaemonRequest {
     pub(crate) fn ping() -> Self {
         Self {
@@ -125,6 +134,7 @@ impl DaemonRequest {
     }
 }
 
+#[cfg(any(unix, test))]
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct DaemonResponse {
     pub(crate) ok: bool,
@@ -146,6 +156,7 @@ pub(crate) struct DaemonResponse {
 
 /// The load-affecting args the daemon was started with. Rows are only
 /// interchangeable with a direct load when every one of these matches.
+#[cfg(any(unix, test))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(crate) struct StartedWith {
     pub(crate) timezone: Option<String>,
@@ -155,6 +166,7 @@ pub(crate) struct StartedWith {
     pub(crate) pricing_overrides: BTreeMap<String, Value>,
 }
 
+#[cfg(any(unix, test))]
 impl StartedWith {
     pub(crate) fn from_shared(shared: &SharedArgs) -> Self {
         Self {
@@ -173,6 +185,7 @@ impl StartedWith {
     }
 }
 
+#[cfg(any(unix, test))]
 pub(crate) fn cost_mode_name(mode: crate::cli::CostMode) -> &'static str {
     match mode {
         crate::cli::CostMode::Auto => "auto",
@@ -183,6 +196,7 @@ pub(crate) fn cost_mode_name(mode: crate::cli::CostMode) -> &'static str {
 
 /// Auto and Calculate both price from the same cost data; Display skips
 /// pricing entirely and only matches Display.
+#[cfg(any(unix, test))]
 fn modes_compatible(client: crate::cli::CostMode, daemon_mode: &str) -> bool {
     match (client, daemon_mode) {
         (crate::cli::CostMode::Display, "display") => true,
@@ -195,6 +209,7 @@ fn modes_compatible(client: crate::cli::CostMode, daemon_mode: &str) -> bool {
     }
 }
 
+#[cfg(any(unix, test))]
 fn pricing_overrides_json(shared: &SharedArgs) -> BTreeMap<String, Value> {
     shared
         .pricing_overrides
@@ -203,6 +218,7 @@ fn pricing_overrides_json(shared: &SharedArgs) -> BTreeMap<String, Value> {
         .collect()
 }
 
+#[cfg(any(unix, test))]
 fn pricing_override_json(override_: &PricingOverride) -> Value {
     let mut map = Map::new();
     let mut insert = |name: &str, value: Option<f64>| {
