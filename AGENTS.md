@@ -1,7 +1,7 @@
 # AGENTS.md
 
-turbotokens is a Rust workspace under `rust/`. There is no JavaScript build;
-the binary is the product.
+turbotokens is a Rust workspace under `rust/`. The binary is the product;
+`npm/` is only a thin downloader wrapper around release binaries.
 
 ## Layout
 
@@ -18,6 +18,10 @@ the binary is the product.
   `gen_scaling_data.py` (synthetic Claude-format datasets, 1B-50B tokens),
   `scaling-bench.sh` (turbotokens vs ccusage timing + parity check),
   `plot_scaling.py` (matplotlib chart)
+- `npm/` — npm wrapper package (`npx turbotokens`): postinstall downloads the
+  matching GitHub release binary
+- `packaging/` — Homebrew formula template + publishing docs for external
+  install channels (brew tap, npm, Scoop)
 
 ## Commands
 
