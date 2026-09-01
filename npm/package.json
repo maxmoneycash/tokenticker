@@ -1,6 +1,6 @@
 {
   "name": "turbotokens",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Real-time token and cost telemetry for AI coding agents — Claude Code, Codex, and 14 more. Single Rust binary, no runtime.",
   "keywords": [
     "claude-code",
