@@ -9,18 +9,18 @@ class Turbotokens < Formula
   on_macos do
     on_arm do
       url "https://github.com/maxmoneycash/turbotokens/releases/download/v#{version}/turbotokens-macos-arm64.tar.gz"
-      sha256 "REPLACE_WITH_MACOS_ARM64_SHA256"
+      sha256 "f4e856d588f01ea68d9e7f5196cc53eedd71ac0b1ed3decafa20f62dbd2c1794"
     end
     on_intel do
       url "https://github.com/maxmoneycash/turbotokens/releases/download/v#{version}/turbotokens-macos-x64.tar.gz"
-      sha256 "REPLACE_WITH_MACOS_X64_SHA256"
+      sha256 "9c4989460010b152e70ec8709f3ca83514c58c447e57a7d45d579fc64bea8706"
     end
   end
 
   on_linux do
     on_intel do
       url "https://github.com/maxmoneycash/turbotokens/releases/download/v#{version}/turbotokens-linux-x64.tar.gz"
-      sha256 "REPLACE_WITH_LINUX_X64_SHA256"
+      sha256 "b67025928bd005640d087e83fddd33747200db81e204b813c5745281d06ef60a"
     end
   end
 
