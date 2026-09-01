@@ -145,3 +145,14 @@ cargo test --workspace --features fetch-litellm-pricing
 bench/warm-bench.sh 10     # warm-vs-uncached median + byte-parity check
 bench/latency-probe.sh 20  # live-mode end-to-end latency, p50/p95
 ```
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+turbotokens began as a fork of [ccusage](https://github.com/ccusage/ccusage)
+by [@ryoppippi](https://github.com/ryoppippi), and is a substantial rewrite of
+it. The original MIT copyright is preserved in `LICENSE` alongside the new
+work's. ccusage appears in the comparison table above as the tool most people
+are choosing between — the benchmarks there are measured, and the lineage is
+this one.

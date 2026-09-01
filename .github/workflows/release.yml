@@ -22,6 +22,9 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             asset: turbotokens-linux-x64.tar.gz
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            asset: turbotokens-windows-x64.zip
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -37,14 +40,29 @@ jobs:
         working-directory: rust
 
       - name: Verify binary runs
+        if: runner.os != 'Windows'
         run: ./rust/target/${{ matrix.target }}/release/turbotokens --version
 
+      - name: Verify binary runs (Windows)
+        if: runner.os == 'Windows'
+        run: ./rust/target/${{ matrix.target }}/release/turbotokens.exe --version
+
       - name: Package tarball
+        if: runner.os != 'Windows'
         run: |
           mkdir -p dist
           cp "rust/target/${{ matrix.target }}/release/turbotokens" dist/turbotokens
-          cp README.md dist/
-          tar -C dist -czf "${{ matrix.asset }}" turbotokens README.md
+          cp README.md LICENSE dist/
+          tar -C dist -czf "${{ matrix.asset }}" turbotokens README.md LICENSE
+
+      - name: Package zip (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          mkdir -p dist
+          cp "rust/target/${{ matrix.target }}/release/turbotokens.exe" dist/turbotokens.exe
+          cp README.md, LICENSE dist/
+          Compress-Archive -Path dist/turbotokens.exe, dist/README.md, dist/LICENSE -DestinationPath "${{ matrix.asset }}"
 
       - name: Upload to GitHub release
         uses: softprops/action-gh-release@v2
