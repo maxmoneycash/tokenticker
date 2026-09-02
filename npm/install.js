@@ -16,7 +16,9 @@ const ASSETS = {
   "darwin-arm64": `turbotokens-macos-arm64.tar.gz`,
   "darwin-x64": `turbotokens-macos-x64.tar.gz`,
   "linux-x64": `turbotokens-linux-x64.tar.gz`,
+  "linux-arm64": `turbotokens-linux-arm64.tar.gz`,
   "win32-x64": `turbotokens-windows-x64.zip`,
+  "win32-arm64": `turbotokens-windows-arm64.zip`,
 };
 
 function fail(msg) {

@@ -22,9 +22,15 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             asset: turbotokens-linux-x64.tar.gz
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            asset: turbotokens-linux-arm64.tar.gz
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             asset: turbotokens-windows-x64.zip
+          - os: windows-11-arm
+            target: aarch64-pc-windows-msvc
+            asset: turbotokens-windows-arm64.zip
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
