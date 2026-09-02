@@ -60,8 +60,8 @@ The benchmark above ([harness](rust/bench/scaling-bench.sh), identical logs, byt
 
 | | turbotokens | ccusage | tokscale | token-monitor | claude-code-usage-monitor | Menu-bar apps |
 | --- | --- | --- | --- | --- | --- | --- |
-| What it is | Single Rust binary | TypeScript CLI | Rust CLI + TUI | Desktop widget (JS) | Python CLI | Native macOS apps |
-| Agents covered | **16** | ~16 | 45+ | 32+ | 1 | 1–2 |
+| What it is | Single Rust binary | Rust binary (npx/bunx wrapper) | Rust CLI + TUI | Desktop widget (JS) | Python CLI | Native macOS apps |
+| Agents covered | **16** | 18 | 45+ | 32+ | 1 | 1–2 |
 | Real 2.3 GB / 1,648-file folder, cold | **170 ms** | 6–8.5 s | — | — | — | — |
 | Same folder, warm | **10 ms** | re-parses every run | cached | — | — | — |
 | Resident daemon (<1 ms reports) | Yes | No | No | No | No | No |
