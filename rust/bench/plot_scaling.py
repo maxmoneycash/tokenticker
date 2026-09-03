@@ -39,6 +39,7 @@ plt.rcParams.update({
 })
 
 fig, ax = plt.subplots(figsize=(11, 6.5), dpi=150)
+fig.subplots_adjust(left=0.115, right=0.965, top=0.82, bottom=0.14)
 
 BAR_H = 0.27
 y_ticks, y_labels = [], []
@@ -69,6 +70,18 @@ ax.legend(handles=[mpatches.Patch(color=c, label=t) for t, c in TOOLS],
 ax.spines[["top", "right"]].set_visible(False)
 ax.grid(axis="y", visible=False)
 
-fig.tight_layout()
+# macOS Tahoe window frame: traffic lights, rounded border, soft shadow
+from matplotlib.patches import FancyBboxPatch, Circle
+fig.patches.append(FancyBboxPatch(
+    (0.028, 0.022), 0.944, 0.946, boxstyle="round,pad=0,rounding_size=0.025",
+    transform=fig.transFigure, facecolor="#e2e5e9", edgecolor="none", zorder=-2))  # shadow
+fig.patches.append(FancyBboxPatch(
+    (0.024, 0.026), 0.944, 0.946, boxstyle="round,pad=0,rounding_size=0.025",
+    transform=fig.transFigure, facecolor="white", edgecolor="#d0d7de",
+    linewidth=1.2, zorder=-1))  # window
+for i, c in enumerate(("#ff5f57", "#febc2e", "#28c840")):
+    fig.patches.append(Circle((0.05 + i * 0.022, 0.935), 0.0085,
+                              transform=fig.transFigure, facecolor=c,
+                              edgecolor="none", zorder=1))  # traffic lights
 fig.savefig(out_path)
 print(f"wrote {out_path}")
