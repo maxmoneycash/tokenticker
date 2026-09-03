@@ -5,9 +5,10 @@ use crate::help::{print_help_and_exit, print_version_and_exit};
 use turbotokens_cli::{
     ANTIGRAVITY_AGENT_REPORTS, AgentCommandArgs, AgentReportKind, BlocksArgs, CliConfig, CodexSpeed,
     Command, CompletionShell, CompletionsArgs, CostMode, CostSource, DaemonAction, DaemonArgs,
-    DailyArgs, LimitsArgs, LimitsScope, LiveAgent, LiveArgs, OPENCODE_AGENT_REPORTS,
-    STANDARD_AGENT_REPORTS, SessionArgs, SharedArgs, SortOrder, StatuslineArgs, VisualBurnRate,
-    WeekDay, WeeklyArgs, ZCODE_AGENT_REPORTS, normalize_date_bound,
+    DailyArgs, HeatmapArgs, ImportArgs, LimitsArgs, LimitsScope, LiveAgent, LiveArgs,
+    OPENCODE_AGENT_REPORTS, STANDARD_AGENT_REPORTS, SessionArgs, SharedArgs, SortOrder,
+    StatuslineArgs, VisualBurnRate, WeekDay, WeeklyArgs, WrappedArgs, ZCODE_AGENT_REPORTS,
+    normalize_date_bound,
 };
 
 use crate::Cli;
@@ -363,6 +364,45 @@ fn parse_command(
             Ok(Command::Doctor(shared))
         }
         "limits" => parse_limits_command(parser, shared, LimitsScope::All),
+        "import" => parse_import_command(parser, shared),
+        "heatmap" => {
+            let mut args = HeatmapArgs {
+                shared,
+                cost: false,
+                svg: None,
+            };
+            while parser.peek().is_some() {
+                if parse_shared_arg_for_command(parser, &mut args.shared)? {
+                    continue;
+                }
+                match parser.next_flag()?.as_str() {
+                    "--cost" => args.cost = true,
+                    "--svg" => args.svg = Some(parser.value_for("--svg")?),
+                    flag => return Err(format!("Unknown heatmap option '{flag}'")),
+                }
+            }
+            Ok(Command::Heatmap(args))
+        }
+        "wrapped" => {
+            let mut args = WrappedArgs {
+                shared,
+                year: None,
+                svg: None,
+            };
+            while parser.peek().is_some() {
+                if parse_shared_arg_for_command(parser, &mut args.shared)? {
+                    continue;
+                }
+                match parser.next_flag()?.as_str() {
+                    "--year" => {
+                        args.year = Some(parse_year(&parser.value_for("--year")?)?);
+                    }
+                    "--svg" => args.svg = Some(parser.value_for("--svg")?),
+                    flag => return Err(format!("Unknown wrapped option '{flag}'")),
+                }
+            }
+            Ok(Command::Wrapped(args))
+        }
         "completions" => {
             let Some(shell) = parser.peek().filter(|shell| !shell.starts_with('-')) else {
                 return Err("Usage: turbotokens completions <bash|zsh|fish>".to_string());
@@ -829,6 +869,30 @@ fn parse_limits_command(
     Ok(Command::Limits(LimitsArgs { shared, scope }))
 }
 
+fn parse_import_command(parser: &mut ArgParser, mut shared: SharedArgs) -> Result<Command, String> {
+    let mut file: Option<PathBuf> = None;
+    while let Some(arg) = parser.peek() {
+        if !arg.starts_with('-') {
+            if file.is_some() {
+                return Err(format!("Unexpected argument '{arg}'"));
+            }
+            file = parser.next().map(PathBuf::from);
+            continue;
+        }
+        if parse_shared_arg_for_command(parser, &mut shared)? {
+            continue;
+        }
+        return Err(format!("Unknown import option '{}'", parser.next_flag()?));
+    }
+    let Some(file) = file else {
+        return Err(
+            "Usage: turbotokens import <FILE> (a ccusage JSON export, e.g. from `ccusage daily --json`)"
+                .to_string(),
+        );
+    };
+    Ok(Command::Import(ImportArgs { shared, file }))
+}
+
 fn parse_agent_report_kind(
     parser: &mut ArgParser,
     agent: &str,
@@ -921,6 +985,9 @@ fn is_command(arg: &str) -> bool {
             | "daemon"
             | "doctor"
             | "limits"
+            | "import"
+            | "heatmap"
+            | "wrapped"
             | "completions"
             | "claude"
             | "codex"
@@ -1089,6 +1156,8 @@ fn option_takes_value(arg: &str) -> bool {
             | "--pi-path"
             | "--open-claw-path"
             | "--sections"
+            | "--svg"
+            | "--year"
     )
 }
 
@@ -1217,6 +1286,9 @@ fn last_option_error(command: Option<&Command>, root_shared: &SharedArgs) -> Opt
         Some(Command::Daemon(args)) => (&args.shared, false),
         Some(Command::Doctor(shared)) => (shared, false),
         Some(Command::Limits(args)) => (&args.shared, false),
+        Some(Command::Import(args)) => (&args.shared, false),
+        Some(Command::Heatmap(args)) => (&args.shared, false),
+        Some(Command::Wrapped(args)) => (&args.shared, false),
         Some(Command::Completions(_)) => (root_shared, false),
         Some(
             Command::Codex(args)
@@ -1299,6 +1371,15 @@ fn parse_report_sections(value: &str) -> Result<Vec<AgentReportKind>, String> {
         ));
     }
     Ok(sections)
+}
+
+fn parse_year(value: &str) -> Result<u32, String> {
+    match value.parse::<u32>() {
+        Ok(year) if (2000..=9999).contains(&year) && value.len() == 4 => Ok(year),
+        _ => Err(format!(
+            "Invalid value for --year '{value}'. Expected a four-digit year like 2026."
+        )),
+    }
 }
 
 fn parse_week_day(value: &str) -> Result<WeekDay, String> {

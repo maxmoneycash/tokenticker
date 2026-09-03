@@ -219,6 +219,160 @@
 			"description": "Display this version"
 		}
 	],
+	"import_options": [
+		{
+			"flags": "-j, --json",
+			"description": "Output in JSON format (normalized turbotokens shape)",
+			"default": "false"
+		},
+		{
+			"flags": "-b, --breakdown",
+			"description": "Show per-model breakdown when the export carries modelBreakdowns",
+			"default": "false"
+		},
+		{
+			"flags": "-s, --since <since>",
+			"description": "Filter from date (YYYY-MM-DD or YYYYMMDD; daily/weekly/session exports)"
+		},
+		{
+			"flags": "-u, --until <until>",
+			"description": "Filter until date (inclusive)"
+		},
+		{
+			"flags": "-o, --order <order>",
+			"description": "Sort order for period rows",
+			"default": "asc",
+			"choices": ["asc", "desc"]
+		},
+		{
+			"flags": "--no-cost",
+			"description": "Hide cost information in table and JSON output",
+			"default": "false"
+		},
+		{
+			"flags": "-q, --jq <jq>",
+			"description": "Pipe JSON output through a jq filter"
+		},
+		{
+			"flags": "--color",
+			"description": "Enable colored output. FORCE_COLOR=1 has the same effect.",
+			"default": "auto"
+		},
+		{
+			"flags": "--no-color",
+			"description": "Disable colored output. NO_COLOR=1 has the same effect.",
+			"default": "auto"
+		},
+		{
+			"flags": "-h, --help",
+			"description": "Display this help message"
+		},
+		{
+			"flags": "-v, --version",
+			"description": "Display this version"
+		}
+	],
+	"heatmap_options": [
+		{
+			"flags": "-j, --json",
+			"description": "Output one {date, tokens, cost} entry per day in JSON format",
+			"default": "false"
+		},
+		{
+			"flags": "-s, --since <since>",
+			"description": "Filter from date (YYYY-MM-DD or YYYYMMDD); defaults to one year ago"
+		},
+		{
+			"flags": "-u, --until <until>",
+			"description": "Filter until date (inclusive); defaults to today"
+		},
+		{
+			"flags": "-z, --timezone <timezone>",
+			"description": "Timezone for date grouping (IANA)"
+		},
+		{
+			"flags": "--cost",
+			"description": "Color cells by daily cost instead of tokens",
+			"default": "false"
+		},
+		{
+			"flags": "--svg <svg>",
+			"description": "Write a GitHub-style SVG heatmap image to this file"
+		},
+		{
+			"flags": "-O, --offline",
+			"description": "Use cached pricing data instead of fetching from LiteLLM",
+			"default": "false"
+		},
+		{
+			"flags": "--no-offline",
+			"description": "Negatable of -O, --offline"
+		},
+		{
+			"flags": "--color",
+			"description": "Enable colored output. FORCE_COLOR=1 has the same effect.",
+			"default": "auto"
+		},
+		{
+			"flags": "--no-color",
+			"description": "Disable colored output. NO_COLOR=1 has the same effect.",
+			"default": "auto"
+		},
+		{
+			"flags": "-h, --help",
+			"description": "Display this help message"
+		},
+		{
+			"flags": "-v, --version",
+			"description": "Display this version"
+		}
+	],
+	"wrapped_options": [
+		{
+			"flags": "-j, --json",
+			"description": "Output the year-in-review summary in JSON format",
+			"default": "false"
+		},
+		{
+			"flags": "--year <year>",
+			"description": "Year to summarize (YYYY); defaults to the current year"
+		},
+		{
+			"flags": "--svg <svg>",
+			"description": "Write a shareable 1280x640 SVG summary card to this file"
+		},
+		{
+			"flags": "-z, --timezone <timezone>",
+			"description": "Timezone for date grouping (IANA)"
+		},
+		{
+			"flags": "-O, --offline",
+			"description": "Use cached pricing data instead of fetching from LiteLLM",
+			"default": "false"
+		},
+		{
+			"flags": "--no-offline",
+			"description": "Negatable of -O, --offline"
+		},
+		{
+			"flags": "--color",
+			"description": "Enable colored output. FORCE_COLOR=1 has the same effect.",
+			"default": "auto"
+		},
+		{
+			"flags": "--no-color",
+			"description": "Disable colored output. NO_COLOR=1 has the same effect.",
+			"default": "auto"
+		},
+		{
+			"flags": "-h, --help",
+			"description": "Display this help message"
+		},
+		{
+			"flags": "-v, --version",
+			"description": "Display this version"
+		}
+	],
 	"blocks_options": [
 		{
 			"flags": "-a, --active",

@@ -238,6 +238,23 @@ fn command_snapshot(command: Option<Command>) -> Value {
             "shared": shared_snapshot(&args.shared),
             "scope": format!("{:?}", args.scope),
         }),
+        Some(Command::Import(args)) => json!({
+            "type": "import",
+            "shared": shared_snapshot(&args.shared),
+            "file": args.file.to_string_lossy().to_string(),
+        }),
+        Some(Command::Heatmap(args)) => json!({
+            "type": "heatmap",
+            "shared": shared_snapshot(&args.shared),
+            "cost": args.cost,
+            "svg": args.svg,
+        }),
+        Some(Command::Wrapped(args)) => json!({
+            "type": "wrapped",
+            "shared": shared_snapshot(&args.shared),
+            "year": args.year,
+            "svg": args.svg,
+        }),
     }
 }
 
@@ -1451,4 +1468,120 @@ fn rejects_last_periods_on_limits() {
         parse_error(&["turbotokens", "limits", "--last", "1"]),
         "The --last option is only available for the daily, weekly, and monthly reports."
     );
+}
+
+#[test]
+fn parses_import_command_with_file_and_shared_flags() {
+    let cli = parse(&["turbotokens", "import", "/tmp/export.json"]);
+    let Some(Command::Import(args)) = cli.command else {
+        panic!("expected import command");
+    };
+    assert_eq!(args.file, std::path::PathBuf::from("/tmp/export.json"));
+
+    let cli = parse(&[
+        "turbotokens",
+        "import",
+        "export.json",
+        "--json",
+        "--breakdown",
+        "--since",
+        "2026-01-01",
+    ]);
+    let Some(Command::Import(args)) = cli.command else {
+        panic!("expected import command");
+    };
+    assert_eq!(args.file, std::path::PathBuf::from("export.json"));
+    assert!(args.shared.json);
+    assert!(args.shared.breakdown);
+    assert_eq!(args.shared.since.as_deref(), Some("20260101"));
+}
+
+#[test]
+fn import_command_requires_a_file() {
+    assert_eq!(
+        parse_error(&["turbotokens", "import"]),
+        "Usage: turbotokens import <FILE> (a ccusage JSON export, e.g. from `ccusage daily --json`)"
+    );
+    assert_eq!(
+        parse_error(&["turbotokens", "import", "a.json", "b.json"]),
+        "Unexpected argument 'b.json'"
+    );
+}
+
+#[test]
+fn rejects_last_periods_on_import() {
+    assert_eq!(
+        parse_error(&["turbotokens", "import", "export.json", "--last", "1"]),
+        "The --last option is only available for the daily, weekly, and monthly reports."
+    );
+}
+
+#[test]
+fn parses_heatmap_command_with_cost_svg_and_window() {
+    let cli = parse(&["turbotokens", "heatmap"]);
+    let Some(Command::Heatmap(args)) = cli.command else {
+        panic!("expected heatmap command");
+    };
+    assert!(!args.cost);
+    assert_eq!(args.svg, None);
+
+    let cli = parse(&[
+        "turbotokens",
+        "heatmap",
+        "--cost",
+        "--svg",
+        "heat.svg",
+        "--since",
+        "2026-01-01",
+        "--json",
+    ]);
+    let Some(Command::Heatmap(args)) = cli.command else {
+        panic!("expected heatmap command");
+    };
+    assert!(args.cost);
+    assert_eq!(args.svg.as_deref(), Some("heat.svg"));
+    assert_eq!(args.shared.since.as_deref(), Some("20260101"));
+    assert!(args.shared.json);
+
+    assert!(
+        parse_error(&["turbotokens", "heatmap", "--bogus"]).contains("Unknown heatmap option")
+    );
+}
+
+#[test]
+fn parses_wrapped_command_with_year_and_svg() {
+    let cli = parse(&["turbotokens", "wrapped"]);
+    let Some(Command::Wrapped(args)) = cli.command else {
+        panic!("expected wrapped command");
+    };
+    assert_eq!(args.year, None);
+
+    let cli = parse(&[
+        "turbotokens",
+        "wrapped",
+        "--year",
+        "2025",
+        "--svg=card.svg",
+    ]);
+    let Some(Command::Wrapped(args)) = cli.command else {
+        panic!("expected wrapped command");
+    };
+    assert_eq!(args.year, Some(2025));
+    assert_eq!(args.svg.as_deref(), Some("card.svg"));
+
+    assert!(parse_error(&["turbotokens", "wrapped", "--year", "20"]).contains("--year"));
+    assert!(parse_error(&["turbotokens", "wrapped", "--year", "abc"]).contains("--year"));
+    assert!(
+        parse_error(&["turbotokens", "wrapped", "--bogus"]).contains("Unknown wrapped option")
+    );
+}
+
+#[test]
+fn rejects_last_periods_on_visual_commands() {
+    for command in ["heatmap", "wrapped"] {
+        assert_eq!(
+            parse_error(&["turbotokens", command, "--last", "2"]),
+            "The --last option is only available for the daily, weekly, and monthly reports."
+        );
+    }
 }

@@ -31,9 +31,118 @@ mod adapter {
 
 use crate::{
     Result,
-    cli::{AgentCommandArgs, AgentReportKind},
+    cli::{AgentCommandArgs, AgentReportKind, SharedArgs},
     print_json_or_jq, wants_json,
 };
+
+/// One day of unified usage across every detected agent — the same per-day
+/// aggregation the unified daily report prints, exposed for the visual
+/// commands (`heatmap`, `wrapped`).
+#[derive(Debug, Clone)]
+pub struct DailyAggregate {
+    /// `YYYY-MM-DD`.
+    pub date: String,
+    pub total_tokens: u64,
+    pub total_cost: f64,
+    /// Per-agent split of the day, sorted by agent name.
+    pub agents: Vec<AgentAggregate>,
+    /// Per-model split of the day, sorted by cost descending.
+    pub models: Vec<ModelAggregate>,
+}
+
+#[derive(Debug, Clone)]
+pub struct AgentAggregate {
+    pub agent: String,
+    pub total_tokens: u64,
+    pub total_cost: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct ModelAggregate {
+    pub model: String,
+    pub total_tokens: u64,
+    pub total_cost: f64,
+}
+
+/// One project's unified usage, aggregated from the session report rows of
+/// the agents that record real project paths.
+#[derive(Debug, Clone)]
+pub struct ProjectAggregate {
+    pub project_path: String,
+    pub total_tokens: u64,
+    pub total_cost: f64,
+}
+
+/// Loads the unified per-day aggregates, honoring the shared date window.
+pub fn load_daily_aggregates(shared: &SharedArgs) -> Result<Vec<DailyAggregate>> {
+    let result = loader::load_rows(AgentReportKind::Daily, shared)?;
+    Ok(result.rows.iter().map(daily_aggregate).collect())
+}
+
+/// Loads per-project aggregates from the unified session rows. Agents without
+/// a real project path (most non-directory agents) contribute no rows.
+pub fn load_project_aggregates(shared: &SharedArgs) -> Result<Vec<ProjectAggregate>> {
+    let result = loader::load_rows(AgentReportKind::Session, shared)?;
+    let mut projects = Vec::<ProjectAggregate>::new();
+    for row in &result.rows {
+        let Some(project_path) = row.project_path.as_deref() else {
+            continue;
+        };
+        if project_path.is_empty() || row.total_tokens == 0 {
+            continue;
+        }
+        match projects
+            .iter_mut()
+            .find(|project| project.project_path == project_path)
+        {
+            Some(project) => {
+                project.total_tokens += row.total_tokens;
+                project.total_cost += row.total_cost;
+            }
+            None => projects.push(ProjectAggregate {
+                project_path: project_path.to_string(),
+                total_tokens: row.total_tokens,
+                total_cost: row.total_cost,
+            }),
+        }
+    }
+    projects.sort_by_key(|project| std::cmp::Reverse(project.total_tokens));
+    Ok(projects)
+}
+
+fn daily_aggregate(row: &types::AllRow) -> DailyAggregate {
+    let agents = row
+        .agent_breakdowns
+        .as_deref()
+        .unwrap_or_default()
+        .iter()
+        .map(|breakdown| AgentAggregate {
+            agent: breakdown.agent.to_string(),
+            total_tokens: breakdown.total_tokens,
+            total_cost: breakdown.total_cost,
+        })
+        .collect();
+    let models = row
+        .model_breakdowns
+        .iter()
+        .map(|breakdown| ModelAggregate {
+            model: breakdown.model_name.clone(),
+            total_tokens: breakdown.input_tokens
+                + breakdown.output_tokens
+                + breakdown.cache_creation_tokens
+                + breakdown.cache_read_tokens
+                + breakdown.extra_total_tokens,
+            total_cost: breakdown.cost,
+        })
+        .collect();
+    DailyAggregate {
+        date: row.period.clone(),
+        total_tokens: row.total_tokens,
+        total_cost: row.total_cost,
+        agents,
+        models,
+    }
+}
 
 pub fn run(args: AgentCommandArgs) -> Result<()> {
     let kind = args.kind;

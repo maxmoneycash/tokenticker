@@ -19,6 +19,10 @@ pub(super) struct AllRow {
     pub(super) metadata_agents: Option<Vec<&'static str>>,
     pub(super) agent_breakdowns: Option<Vec<AllRow>>,
     pub(super) model_breakdowns: Vec<ModelBreakdown>,
+    /// Internal-only: the session row's project path, kept off the report JSON
+    /// so the visual commands (wrapped) can aggregate by project without
+    /// changing any report output.
+    pub(super) project_path: Option<String>,
 }
 
 pub(super) struct AllLoadResult {
@@ -125,6 +129,7 @@ impl AllAccumulator {
             metadata_agents: Some(self.agents.into_iter().collect()),
             agent_breakdowns: Some(agent_breakdowns),
             model_breakdowns,
+            project_path: None,
         }
     }
 }

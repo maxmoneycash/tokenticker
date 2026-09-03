@@ -13,7 +13,11 @@ mod completions;
 mod daemon;
 mod daemon_client;
 mod doctor;
+mod heatmap;
+mod import;
 mod limits;
+mod visual;
+mod wrapped;
 
 // Used by the daily report's daemon fast path once wired in; the export is
 // part of the daemon's public-to-the-crate surface.
@@ -25,9 +29,9 @@ use crate::{
     MILLIS_PER_DAY, MILLIS_PER_MINUTE, Result, SessionAccumulator, TimestampMs, block_json,
     calculate_burn_rate,
     cli::{
-        BlocksArgs, CompletionsArgs, CostSource, DaemonArgs, DailyArgs, LimitsArgs, LiveAgent,
-        LiveArgs, SessionArgs, SharedArgs, SortOrder, StatuslineArgs, VisualBurnRate, WeekDay,
-        WeeklyArgs,
+        BlocksArgs, CompletionsArgs, CostSource, DaemonArgs, DailyArgs, HeatmapArgs, ImportArgs,
+        LimitsArgs, LiveAgent, LiveArgs, SessionArgs, SharedArgs, SortOrder, StatuslineArgs,
+        VisualBurnRate, WeekDay, WeeklyArgs, WrappedArgs,
     },
     color,
     fast::FxHashMap,
@@ -375,6 +379,18 @@ pub(crate) fn run_doctor(shared: SharedArgs) -> Result<()> {
 
 pub(crate) fn run_limits(args: LimitsArgs) -> Result<()> {
     limits::run(&args)
+}
+
+pub(crate) fn run_import(args: ImportArgs) -> Result<()> {
+    import::run(&args)
+}
+
+pub(crate) fn run_heatmap(args: HeatmapArgs) -> Result<()> {
+    heatmap::run(&args)
+}
+
+pub(crate) fn run_wrapped(args: WrappedArgs) -> Result<()> {
+    wrapped::run(&args)
 }
 
 pub(crate) fn run_completions(args: CompletionsArgs) -> Result<()> {

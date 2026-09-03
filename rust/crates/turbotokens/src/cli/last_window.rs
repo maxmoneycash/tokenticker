@@ -61,6 +61,9 @@ fn window_target(cli: &mut Cli) -> Option<(&mut SharedArgs, PeriodUnit, WeekDay)
             | Command::Daemon(_)
             | Command::Doctor(_)
             | Command::Limits(_)
+            | Command::Import(_)
+            | Command::Heatmap(_)
+            | Command::Wrapped(_)
             | Command::Completions(_),
         ) => None,
     }

@@ -1,6 +1,5 @@
 ---
 source: crates/turbotokens-cli-parser/src/tests.rs
-assertion_line: 788
 expression: help_text()
 ---
 USAGE:
@@ -18,6 +17,9 @@ COMMANDS:
   daemon                     Run a resident index daemon for near-instant reports
   doctor                     Diagnose data directories, cache health, and pricing setup
   limits                     Show plan-limit / quota usage for subscription agents (Claude, Codex)
+  import                     Render a ccusage JSON export (ccusage daily/monthly/session --json) as a turbotokens report
+  heatmap                    Show a GitHub-style token usage heatmap for the last year
+  wrapped                    Show a year-in-review summary of your agent usage
   completions                Print shell completion scripts
   claude                     Show Claude Code usage commands
   codex                      Show Codex token usage commands
@@ -49,6 +51,9 @@ For more info, run any command with the `--help` flag:
   turbotokens daemon --help
   turbotokens doctor --help
   turbotokens limits --help
+  turbotokens import --help
+  turbotokens heatmap --help
+  turbotokens wrapped --help
   turbotokens completions --help
   turbotokens claude --help
   turbotokens codex --help

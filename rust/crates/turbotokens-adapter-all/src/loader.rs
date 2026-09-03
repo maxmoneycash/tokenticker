@@ -789,6 +789,7 @@ fn summary_rows(
                 metadata_agents: Some(vec![agent]),
                 agent_breakdowns: None,
                 model_breakdowns: summary.model_breakdowns,
+                project_path: summary.project_path,
             })
         })
         .collect()
@@ -860,6 +861,7 @@ where
         metadata_agents: Some(vec!["codex"]),
         agent_breakdowns: None,
         model_breakdowns,
+        project_path: None,
     }
 }
 

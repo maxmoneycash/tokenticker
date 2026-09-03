@@ -32,6 +32,9 @@ pub enum Command {
     Qwen(AgentCommandArgs),
     OpenClaw(AgentCommandArgs),
     Limits(LimitsArgs),
+    Import(ImportArgs),
+    Heatmap(HeatmapArgs),
+    Wrapped(WrappedArgs),
     ZCode(AgentCommandArgs),
 }
 
@@ -167,6 +170,30 @@ pub enum LimitsScope {
     All,
     Claude,
     Codex,
+}
+
+#[derive(Clone)]
+pub struct ImportArgs {
+    pub shared: SharedArgs,
+    pub file: PathBuf,
+}
+
+#[derive(Clone)]
+pub struct HeatmapArgs {
+    pub shared: SharedArgs,
+    /// Color cells by cost instead of tokens.
+    pub cost: bool,
+    /// Write a GitHub-style SVG heatmap to this path.
+    pub svg: Option<String>,
+}
+
+#[derive(Clone)]
+pub struct WrappedArgs {
+    pub shared: SharedArgs,
+    /// Year to summarize (YYYY); defaults to the current year.
+    pub year: Option<u32>,
+    /// Write a shareable SVG summary card to this path.
+    pub svg: Option<String>,
 }
 
 #[derive(Clone)]

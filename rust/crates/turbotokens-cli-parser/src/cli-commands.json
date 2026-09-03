@@ -61,6 +61,18 @@
 				"description": "Show plan-limit / quota usage for subscription agents (Claude, Codex)"
 			},
 			{
+				"name": "import",
+				"description": "Render a ccusage JSON export (ccusage daily/monthly/session --json) as a turbotokens report"
+			},
+			{
+				"name": "heatmap",
+				"description": "Show a GitHub-style token usage heatmap for the last year"
+			},
+			{
+				"name": "wrapped",
+				"description": "Show a year-in-review summary of your agent usage"
+			},
+			{
 				"name": "completions",
 				"description": "Print shell completion scripts"
 			},
@@ -198,6 +210,24 @@
 			"description": "Show plan-limit / quota usage for subscription agents (Claude, Codex)",
 			"usage": "turbotokens limits <OPTIONS>",
 			"options": "limits_options"
+		},
+		{
+			"path": ["import"],
+			"description": "Render a ccusage JSON export (ccusage daily/monthly/session --json) as a turbotokens report",
+			"usage": "turbotokens import <FILE> <OPTIONS>",
+			"options": "import_options"
+		},
+		{
+			"path": ["heatmap"],
+			"description": "Show a GitHub-style token usage heatmap for the last year",
+			"usage": "turbotokens heatmap <OPTIONS>",
+			"options": "heatmap_options"
+		},
+		{
+			"path": ["wrapped"],
+			"description": "Show a year-in-review summary of your agent usage",
+			"usage": "turbotokens wrapped <OPTIONS>",
+			"options": "wrapped_options"
 		},
 		{
 			"path": ["completions"],
