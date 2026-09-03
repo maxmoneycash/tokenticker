@@ -1,5 +1,6 @@
 ---
 source: crates/turbotokens-cli-parser/src/tests.rs
+assertion_line: 788
 expression: help_text()
 ---
 USAGE:
@@ -16,6 +17,7 @@ COMMANDS:
   live                       Stream Claude Code token usage in real time
   daemon                     Run a resident index daemon for near-instant reports
   doctor                     Diagnose data directories, cache health, and pricing setup
+  limits                     Show plan-limit / quota usage for subscription agents (Claude, Codex)
   completions                Print shell completion scripts
   claude                     Show Claude Code usage commands
   codex                      Show Codex token usage commands
@@ -30,9 +32,11 @@ COMMANDS:
   kilo                       Show Kilo usage commands
   copilot                    Show GitHub Copilot CLI usage commands
   gemini                     Show Gemini CLI usage commands
+  antigravity                Show Antigravity usage commands
   kimi                       Show Kimi usage commands
   qwen                       Show Qwen usage commands
   openclaw                   Show OpenClaw usage commands
+  zcode                      Show ZCode usage commands
 
 For more info, run any command with the `--help` flag:
   turbotokens daily --help
@@ -44,6 +48,7 @@ For more info, run any command with the `--help` flag:
   turbotokens live --help
   turbotokens daemon --help
   turbotokens doctor --help
+  turbotokens limits --help
   turbotokens completions --help
   turbotokens claude --help
   turbotokens codex --help
@@ -58,9 +63,11 @@ For more info, run any command with the `--help` flag:
   turbotokens kilo --help
   turbotokens copilot --help
   turbotokens gemini --help
+  turbotokens antigravity --help
   turbotokens kimi --help
   turbotokens qwen --help
   turbotokens openclaw --help
+  turbotokens zcode --help
 
 OPTIONS:
   -j, --json                           Output in JSON format (default: false)

@@ -13,6 +13,7 @@ mod completions;
 mod daemon;
 mod daemon_client;
 mod doctor;
+mod limits;
 
 // Used by the daily report's daemon fast path once wired in; the export is
 // part of the daemon's public-to-the-crate surface.
@@ -24,8 +25,9 @@ use crate::{
     MILLIS_PER_DAY, MILLIS_PER_MINUTE, Result, SessionAccumulator, TimestampMs, block_json,
     calculate_burn_rate,
     cli::{
-        BlocksArgs, CompletionsArgs, CostSource, DaemonArgs, DailyArgs, LiveAgent, LiveArgs,
-        SessionArgs, SharedArgs, SortOrder, StatuslineArgs, VisualBurnRate, WeekDay, WeeklyArgs,
+        BlocksArgs, CompletionsArgs, CostSource, DaemonArgs, DailyArgs, LimitsArgs, LiveAgent,
+        LiveArgs, SessionArgs, SharedArgs, SortOrder, StatuslineArgs, VisualBurnRate, WeekDay,
+        WeeklyArgs,
     },
     color,
     fast::FxHashMap,
@@ -369,6 +371,10 @@ pub(crate) fn run_daemon(args: DaemonArgs) -> Result<()> {
 
 pub(crate) fn run_doctor(shared: SharedArgs) -> Result<()> {
     doctor::run(&shared)
+}
+
+pub(crate) fn run_limits(args: LimitsArgs) -> Result<()> {
+    limits::run(&args)
 }
 
 pub(crate) fn run_completions(args: CompletionsArgs) -> Result<()> {

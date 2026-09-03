@@ -10,6 +10,7 @@ use turbotokens_core::*;
 
 mod adapter {
     pub use turbotokens_adapter_amp as amp;
+    pub use turbotokens_adapter_antigravity as antigravity;
     pub use turbotokens_adapter_claude as claude;
     pub use turbotokens_adapter_codebuff as codebuff;
     pub use turbotokens_adapter_codex as codex;
@@ -25,6 +26,7 @@ mod adapter {
     pub use turbotokens_adapter_opencode as opencode;
     pub use turbotokens_adapter_pi as pi;
     pub use turbotokens_adapter_qwen as qwen;
+    pub use turbotokens_adapter_zcode as zcode;
 }
 
 use crate::{

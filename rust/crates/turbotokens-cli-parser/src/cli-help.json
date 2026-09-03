@@ -190,6 +190,35 @@
 			"default": "false"
 		}
 	],
+	"limits_options": [
+		{
+			"flags": "-j, --json",
+			"description": "Output in JSON format",
+			"default": "false"
+		},
+		{
+			"flags": "-z, --timezone <timezone>",
+			"description": "Timezone for reset times (IANA)"
+		},
+		{
+			"flags": "--color",
+			"description": "Enable colored output. FORCE_COLOR=1 has the same effect.",
+			"default": "auto"
+		},
+		{
+			"flags": "--no-color",
+			"description": "Disable colored output. NO_COLOR=1 has the same effect.",
+			"default": "auto"
+		},
+		{
+			"flags": "-h, --help",
+			"description": "Display this help message"
+		},
+		{
+			"flags": "-v, --version",
+			"description": "Display this version"
+		}
+	],
 	"blocks_options": [
 		{
 			"flags": "-a, --active",

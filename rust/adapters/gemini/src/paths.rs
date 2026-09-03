@@ -43,8 +43,10 @@ pub(super) fn discover_log_files() -> Result<Vec<PathBuf>> {
 
 #[cfg(test)]
 mod tests {
+    use std::ffi::OsString;
+
     use super::*;
-    use turbotokens_test_support::fs_fixture;
+    use turbotokens_test_support::{EnvVarsGuard, fs_fixture};
 
     #[test]
     fn discovers_json_and_jsonl_logs() {
@@ -60,5 +62,27 @@ mod tests {
             files,
             vec![fixture.path("chats/a.json"), fixture.path("chats/b.jsonl")]
         );
+    }
+
+    #[test]
+    fn antigravity_override_does_not_replace_gemini_discovery() {
+        let fixture = fs_fixture!({
+            "gemini/chats/a.json": "{}",
+            "antigravity/conversations/a.db": "not a Gemini log",
+        });
+        let _guard = EnvVarsGuard::set_many([
+            (
+                GEMINI_DATA_DIR_ENV,
+                Some(OsString::from(fixture.path("gemini"))),
+            ),
+            (
+                "ANTIGRAVITY_DATA_DIR",
+                Some(OsString::from(fixture.path("antigravity"))),
+            ),
+        ]);
+
+        let files = discover_log_files().unwrap();
+
+        assert_eq!(files, vec![fixture.path("gemini/chats/a.json")]);
     }
 }

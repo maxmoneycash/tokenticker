@@ -18,6 +18,7 @@ publish = false
 [workspace.dependencies]
 turbotokens-adapter-all = { path = "crates/turbotokens-adapter-all" }
 turbotokens-adapter-amp = { path = "adapters/amp" }
+turbotokens-adapter-antigravity = { path = "adapters/antigravity" }
 turbotokens-adapter-claude = { path = "adapters/claude" }
 turbotokens-adapter-codebuff = { path = "adapters/codebuff" }
 turbotokens-adapter-codex = { path = "adapters/codex" }
@@ -34,6 +35,7 @@ turbotokens-adapter-openclaw = { path = "adapters/openclaw" }
 turbotokens-adapter-opencode = { path = "adapters/opencode" }
 turbotokens-adapter-pi = { path = "adapters/pi" }
 turbotokens-adapter-qwen = { path = "adapters/qwen" }
+turbotokens-adapter-zcode = { path = "adapters/zcode" }
 turbotokens-cli = { path = "crates/turbotokens-cli" }
 turbotokens-cli-parser = { path = "crates/turbotokens-cli-parser" }
 turbotokens-config = { path = "crates/turbotokens-config" }

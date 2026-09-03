@@ -7,7 +7,7 @@ Real-time token and cost telemetry for AI coding agents. Single Rust binary, no 
 [![cold report](assets/badges/speed.svg)](#how-it-compares)
 [![built with Rust](assets/badges/rust.svg)](#development)
 
-AI coding agents write every token they use into local JSONL logs. turbotokens reads those logs in place — nothing uploaded, no config — and turns them into cost reports, a live dashboard, budget alerts, and metrics. It supports 16 agents: Claude Code, Codex, OpenCode, Amp, Gemini, Copilot, Kimi, Grok Build, Qwen, Droid, Codebuff, Hermes, Goose, Kilo, OpenClaw, and pi-agent.
+AI coding agents write every token they use into local JSONL logs. turbotokens reads those logs in place — nothing uploaded, no config — and turns them into cost reports, a live dashboard, plan-limit tracking, budget alerts, and metrics. It supports 18 agents: Claude Code, Codex, OpenCode, Amp, Gemini, Copilot, Kimi, Grok Build, Qwen, Droid, Codebuff, Hermes, Goose, Kilo, OpenClaw, pi-agent, Antigravity, and ZCode.
 
 <img src="assets/scaling-chart.png" alt="How long it takes to count N tokens: turbotokens 53 ms at 1B tokens up to 1.2 s at 50B; ccusage 489 ms up to 3.2 s; tokscale 3.0 s up to 11.6 s" width="1000">
 
@@ -29,6 +29,7 @@ Prebuilt binaries for macOS (arm64/x64), Linux (x64/arm64), and Windows (x64/arm
 | --- | --- |
 | `turbotokens daily` / `weekly` / `monthly` / `session` | Cost reports grouped by day, week, month, or session |
 | `turbotokens blocks` | Usage per 5-hour billing window |
+| `turbotokens limits` | Plan-limit / quota tracking (Claude, Codex) — 5-hour and weekly window utilization and reset times |
 | `turbotokens claude daily` | The same reports for one agent — every agent has its own subcommand (`codex`, `opencode`, `gemini`, `grok`, …) |
 | `turbotokens live` | Real-time dashboard: today's spend, 5-minute burn rate, model share, active sessions, and every event as it lands |
 | `turbotokens live --agent codex` | Live dashboard for a different agent |
@@ -61,7 +62,7 @@ The benchmark above ([harness](rust/bench/scaling-bench.sh), identical logs, byt
 | | turbotokens | ccusage | tokscale | token-monitor | claude-code-usage-monitor | Menu-bar apps |
 | --- | --- | --- | --- | --- | --- | --- |
 | What it is | Single Rust binary | Rust binary (npx/bunx wrapper) | Rust CLI + TUI | Desktop widget (JS) | Python CLI | Native macOS apps |
-| Agents covered | **16** | 18 | 45+ | 32+ | 1 | 1–2 |
+| Agents covered | **18** | 18 | 45+ | 32+ | 1 | 1–2 |
 | Real 2.3 GB / 1,648-file folder, cold | **170 ms** | 6–8.5 s | — | — | — | — |
 | Same folder, warm | **10 ms** | re-parses every run | cached | — | — | — |
 | Resident daemon (<1 ms reports) | Yes | No | No | No | No | No |

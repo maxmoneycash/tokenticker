@@ -20,6 +20,7 @@ source in its own `turbotokens-adapter-*` crate.
 
 - `turbotokens-adapter-all`
 - `turbotokens-adapter-amp`
+- `turbotokens-adapter-antigravity`
 - `turbotokens-adapter-claude`
 - `turbotokens-adapter-codebuff`
 - `turbotokens-adapter-codex`

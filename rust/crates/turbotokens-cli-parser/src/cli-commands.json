@@ -57,6 +57,10 @@
 				"description": "Diagnose data directories, cache health, and pricing setup"
 			},
 			{
+				"name": "limits",
+				"description": "Show plan-limit / quota usage for subscription agents (Claude, Codex)"
+			},
+			{
 				"name": "completions",
 				"description": "Print shell completion scripts"
 			},
@@ -113,6 +117,10 @@
 				"description": "Show Gemini CLI usage commands"
 			},
 			{
+				"name": "antigravity",
+				"description": "Show Antigravity usage commands"
+			},
+			{
 				"name": "kimi",
 				"description": "Show Kimi usage commands"
 			},
@@ -123,6 +131,10 @@
 			{
 				"name": "openclaw",
 				"description": "Show OpenClaw usage commands"
+			},
+			{
+				"name": "zcode",
+				"description": "Show ZCode usage commands"
 			}
 		]
 	},
@@ -182,6 +194,12 @@
 			"options": "doctor_options"
 		},
 		{
+			"path": ["limits"],
+			"description": "Show plan-limit / quota usage for subscription agents (Claude, Codex)",
+			"usage": "turbotokens limits <OPTIONS>",
+			"options": "limits_options"
+		},
+		{
 			"path": ["completions"],
 			"description": "Print shell completion scripts",
 			"usage": "turbotokens completions <bash|zsh|fish>"
@@ -214,6 +232,10 @@
 				{
 					"name": "statusline",
 					"description": "Display compact status line for Claude Code hooks with hybrid time+file caching (Beta)"
+				},
+				{
+					"name": "limits",
+					"description": "Show Claude plan-limit / quota usage (5-hour and weekly windows)"
 				}
 			]
 		},
@@ -254,6 +276,12 @@
 			"options": "statusline_options"
 		},
 		{
+			"path": ["claude", "limits"],
+			"description": "Show Claude plan-limit / quota usage (5-hour and weekly windows)",
+			"usage": "turbotokens claude limits <OPTIONS>",
+			"options": "limits_options"
+		},
+		{
 			"path": ["codex"],
 			"description": "Usage reports for codex.",
 			"usage": "turbotokens codex <COMMANDS>",
@@ -269,6 +297,10 @@
 				{
 					"name": "session",
 					"description": "Show Codex token usage grouped by session"
+				},
+				{
+					"name": "limits",
+					"description": "Show Codex plan-limit / quota usage (5-hour and weekly windows)"
 				}
 			]
 		},
@@ -289,6 +321,12 @@
 			"description": "Show Codex token usage grouped by session",
 			"usage": "turbotokens codex session <OPTIONS>",
 			"options": "codex_options"
+		},
+		{
+			"path": ["codex", "limits"],
+			"description": "Show Codex plan-limit / quota usage (5-hour and weekly windows)",
+			"usage": "turbotokens codex limits <OPTIONS>",
+			"options": "limits_options"
 		},
 		{
 			"path": ["opencode"],
@@ -671,6 +709,53 @@
 			"options": "agent_options"
 		},
 		{
+			"path": ["antigravity"],
+			"description": "Usage reports for antigravity.",
+			"usage": "turbotokens antigravity <COMMANDS>",
+			"commands": [
+				{
+					"name": "daily",
+					"description": "Show Antigravity usage grouped by date"
+				},
+				{
+					"name": "weekly",
+					"description": "Show Antigravity usage grouped by week"
+				},
+				{
+					"name": "monthly",
+					"description": "Show Antigravity usage grouped by month"
+				},
+				{
+					"name": "session",
+					"description": "Show Antigravity usage grouped by session"
+				}
+			]
+		},
+		{
+			"path": ["antigravity", "daily"],
+			"description": "Show Antigravity usage grouped by date",
+			"usage": "turbotokens antigravity daily <OPTIONS>",
+			"options": "agent_period_options"
+		},
+		{
+			"path": ["antigravity", "weekly"],
+			"description": "Show Antigravity usage grouped by week",
+			"usage": "turbotokens antigravity weekly <OPTIONS>",
+			"options": "agent_period_options"
+		},
+		{
+			"path": ["antigravity", "monthly"],
+			"description": "Show Antigravity usage grouped by month",
+			"usage": "turbotokens antigravity monthly <OPTIONS>",
+			"options": "agent_period_options"
+		},
+		{
+			"path": ["antigravity", "session"],
+			"description": "Show Antigravity usage grouped by session",
+			"usage": "turbotokens antigravity session <OPTIONS>",
+			"options": "agent_options"
+		},
+		{
 			"path": ["kimi"],
 			"description": "Usage reports for kimi.",
 			"usage": "turbotokens kimi <COMMANDS>",
@@ -817,6 +902,53 @@
 			"description": "Show OpenClaw usage grouped by session",
 			"usage": "turbotokens openclaw session <OPTIONS>",
 			"options": "openclaw_combined_options"
+		},
+		{
+			"path": ["zcode"],
+			"description": "Usage reports for ZCode.",
+			"usage": "turbotokens zcode <COMMANDS>",
+			"commands": [
+				{
+					"name": "daily",
+					"description": "Show ZCode usage grouped by date"
+				},
+				{
+					"name": "weekly",
+					"description": "Show ZCode usage grouped by week"
+				},
+				{
+					"name": "monthly",
+					"description": "Show ZCode usage grouped by month"
+				},
+				{
+					"name": "session",
+					"description": "Show ZCode usage grouped by session"
+				}
+			]
+		},
+		{
+			"path": ["zcode", "daily"],
+			"description": "Show ZCode usage grouped by date",
+			"usage": "turbotokens zcode daily <OPTIONS>",
+			"options": "agent_period_options"
+		},
+		{
+			"path": ["zcode", "weekly"],
+			"description": "Show ZCode usage grouped by week",
+			"usage": "turbotokens zcode weekly <OPTIONS>",
+			"options": "agent_period_options"
+		},
+		{
+			"path": ["zcode", "monthly"],
+			"description": "Show ZCode usage grouped by month",
+			"usage": "turbotokens zcode monthly <OPTIONS>",
+			"options": "agent_period_options"
+		},
+		{
+			"path": ["zcode", "session"],
+			"description": "Show ZCode usage grouped by session",
+			"usage": "turbotokens zcode session <OPTIONS>",
+			"options": "agent_options"
 		}
 	]
 }

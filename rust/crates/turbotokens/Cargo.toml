@@ -17,6 +17,7 @@ fetch-litellm-pricing = ["turbotokens-core/fetch-litellm-pricing"]
 [dependencies]
 turbotokens-adapter-all.workspace = true
 turbotokens-adapter-amp.workspace = true
+turbotokens-adapter-antigravity.workspace = true
 turbotokens-adapter-claude.workspace = true
 turbotokens-adapter-codebuff.workspace = true
 turbotokens-adapter-codex.workspace = true
@@ -33,6 +34,7 @@ turbotokens-adapter-openclaw.workspace = true
 turbotokens-adapter-opencode.workspace = true
 turbotokens-adapter-pi.workspace = true
 turbotokens-adapter-qwen.workspace = true
+turbotokens-adapter-zcode.workspace = true
 turbotokens-cli-parser.workspace = true
 turbotokens-cli.workspace = true
 turbotokens-config.workspace = true

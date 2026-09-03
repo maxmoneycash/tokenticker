@@ -14,6 +14,7 @@ COMMANDS:
   session     Show usage report grouped by conversation session
   blocks      Show usage report grouped by session billing blocks
   statusline  Display compact status line for Claude Code hooks with hybrid time+file caching (Beta)
+  limits      Show Claude plan-limit / quota usage (5-hour and weekly windows)
 
 For more info, run any command with the `--help` flag:
   turbotokens claude daily --help
@@ -22,3 +23,4 @@ For more info, run any command with the `--help` flag:
   turbotokens claude session --help
   turbotokens claude blocks --help
   turbotokens claude statusline --help
+  turbotokens claude limits --help

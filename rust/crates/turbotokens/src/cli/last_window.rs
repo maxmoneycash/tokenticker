@@ -47,9 +47,11 @@ fn window_target(cli: &mut Cli) -> Option<(&mut SharedArgs, PeriodUnit, WeekDay)
             | Command::Kilo(args)
             | Command::Copilot(args)
             | Command::Gemini(args)
+            | Command::Antigravity(args)
             | Command::Kimi(args)
             | Command::Qwen(args)
-            | Command::OpenClaw(args),
+            | Command::OpenClaw(args)
+            | Command::ZCode(args),
         ) => agent_window_target(args),
         Some(
             Command::Session(_)
@@ -58,6 +60,7 @@ fn window_target(cli: &mut Cli) -> Option<(&mut SharedArgs, PeriodUnit, WeekDay)
             | Command::Live(_)
             | Command::Daemon(_)
             | Command::Doctor(_)
+            | Command::Limits(_)
             | Command::Completions(_),
         ) => None,
     }

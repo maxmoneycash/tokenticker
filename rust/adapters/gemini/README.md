@@ -18,7 +18,8 @@ Anything that is not specific to this source belongs in `turbotokens-core` or
 - `${GEMINI_DATA_DIR:-~/.gemini}/tmp/**/chats/*.{json,jsonl}`
 
 Reads plain files through `turbotokens-adapter-common`, which handles walking, size-balanced
-chunking, and ordered parallel reads.
+chunking, and ordered parallel reads. Antigravity SQLite data is owned by the
+standalone `turbotokens-adapter-antigravity` source.
 
 ## Public surface
 

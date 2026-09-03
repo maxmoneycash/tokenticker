@@ -228,9 +228,16 @@ fn command_snapshot(command: Option<Command>) -> Value {
         Some(Command::Kilo(args)) => agent_command_snapshot("kilo", args),
         Some(Command::Copilot(args)) => agent_command_snapshot("copilot", args),
         Some(Command::Gemini(args)) => agent_command_snapshot("gemini", args),
+        Some(Command::Antigravity(args)) => agent_command_snapshot("antigravity", args),
         Some(Command::Kimi(args)) => agent_command_snapshot("kimi", args),
         Some(Command::Qwen(args)) => agent_command_snapshot("qwen", args),
         Some(Command::OpenClaw(args)) => agent_command_snapshot("openclaw", args),
+        Some(Command::ZCode(args)) => agent_command_snapshot("zcode", args),
+        Some(Command::Limits(args)) => json!({
+            "type": "limits",
+            "shared": shared_snapshot(&args.shared),
+            "scope": format!("{:?}", args.scope),
+        }),
     }
 }
 
@@ -687,7 +694,7 @@ fn root_help_lists_agent_namespaces_without_nested_commands() {
     let help = help_text();
     let agents = [
         "claude", "codex", "opencode", "amp", "droid", "codebuff", "hermes", "pi", "goose", "kilo",
-        "copilot", "gemini", "kimi", "qwen", "grok", "openclaw",
+        "copilot", "gemini", "kimi", "qwen", "grok", "openclaw", "zcode",
     ];
 
     for agent in agents {
@@ -872,6 +879,10 @@ fn snapshots_representative_cli_parse_shapes() {
         json!({
             "case": "opencode weekly",
             "cli": cli_snapshot(parse(&["turbotokens", "opencode", "weekly", "--json"])),
+        }),
+        json!({
+            "case": "antigravity session",
+            "cli": cli_snapshot(parse(&["turbotokens", "antigravity", "session", "--json"])),
         }),
         json!({
             "case": "live with interval",
@@ -1249,6 +1260,23 @@ fn parses_gemini_session_options() {
 }
 
 #[test]
+fn parses_antigravity_weekly_and_session_options() {
+    let cli = parse(&["turbotokens", "antigravity", "weekly", "--json"]);
+    let Some(Command::Antigravity(args)) = cli.command else {
+        panic!("expected antigravity command");
+    };
+    assert_eq!(args.kind, AgentReportKind::Weekly);
+    assert!(args.shared.json);
+
+    let cli = parse(&["turbotokens", "antigravity", "session", "--json"]);
+    let Some(Command::Antigravity(args)) = cli.command else {
+        panic!("expected antigravity command");
+    };
+    assert_eq!(args.kind, AgentReportKind::Session);
+    assert!(args.shared.json);
+}
+
+#[test]
 fn parses_kimi_session_options() {
     let cli = parse(&["turbotokens", "kimi", "session", "--json"]);
     let Some(Command::Kimi(args)) = cli.command else {
@@ -1284,6 +1312,23 @@ fn parses_openclaw_session_options() {
     assert_eq!(args.kind, AgentReportKind::Session);
     assert!(args.shared.json);
     assert_eq!(args.open_claw_path.as_deref(), Some("/tmp/openclaw"));
+}
+
+#[test]
+fn parses_zcode_weekly_and_session_options() {
+    let cli = parse(&["turbotokens", "zcode", "weekly", "--json"]);
+    let Some(Command::ZCode(args)) = cli.command else {
+        panic!("expected zcode command");
+    };
+    assert_eq!(args.kind, AgentReportKind::Weekly);
+    assert!(args.shared.json);
+
+    let cli = parse(&["turbotokens", "zcode", "session", "--json"]);
+    let Some(Command::ZCode(args)) = cli.command else {
+        panic!("expected zcode command");
+    };
+    assert_eq!(args.kind, AgentReportKind::Session);
+    assert!(args.shared.json);
 }
 
 #[test]
@@ -1365,5 +1410,45 @@ fn reports_named_pi_store_validation_through_cli_config_error_path() {
     assert_eq!(
         error,
         "Invalid turbotokens config: pi.stores name 'codex' collides with a built-in agent"
+    );
+}
+
+#[test]
+fn parses_limits_command_scopes() {
+    let cli = parse(&["turbotokens", "limits", "--json"]);
+    let Some(Command::Limits(args)) = cli.command else {
+        panic!("expected limits command");
+    };
+    assert_eq!(args.scope, LimitsScope::All);
+    assert!(args.shared.json);
+
+    let cli = parse(&["turbotokens", "claude", "limits", "--no-color"]);
+    let Some(Command::Limits(args)) = cli.command else {
+        panic!("expected limits command");
+    };
+    assert_eq!(args.scope, LimitsScope::Claude);
+    assert!(args.shared.no_color);
+
+    let cli = parse(&["turbotokens", "codex", "limits", "-z", "Asia/Tokyo"]);
+    let Some(Command::Limits(args)) = cli.command else {
+        panic!("expected limits command");
+    };
+    assert_eq!(args.scope, LimitsScope::Codex);
+    assert_eq!(args.shared.timezone.as_deref(), Some("Asia/Tokyo"));
+}
+
+#[test]
+fn rejects_limits_command_for_agents_without_plan_limits() {
+    assert_eq!(
+        parse_error(&["turbotokens", "gemini", "limits"]),
+        "The \"limits\" report is not available for Gemini CLI usage.\nUse \"turbotokens gemini daily\" for Gemini CLI usage reports."
+    );
+}
+
+#[test]
+fn rejects_last_periods_on_limits() {
+    assert_eq!(
+        parse_error(&["turbotokens", "limits", "--last", "1"]),
+        "The --last option is only available for the daily, weekly, and monthly reports."
     );
 }

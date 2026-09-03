@@ -48,6 +48,8 @@ pub struct TurbotokensConfig {
     pub copilot: Option<CopilotConfig>,
     /// Gemini CLI configuration.
     pub gemini: Option<GeminiConfig>,
+    /// Antigravity configuration.
+    pub antigravity: Option<AntigravityConfig>,
     /// Kimi configuration.
     pub kimi: Option<KimiConfig>,
     /// Qwen configuration.
@@ -287,6 +289,22 @@ pub struct GeminiConfig {
 #[serde(rename_all = "camelCase")]
 pub struct GeminiCommandsConfig {
     pub daily: Option<SharedOptions>,
+    pub monthly: Option<SharedOptions>,
+    pub session: Option<SharedOptions>,
+}
+
+#[derive(Debug, Default, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct AntigravityConfig {
+    pub defaults: Option<SharedOptions>,
+    pub commands: Option<AntigravityCommandsConfig>,
+}
+
+#[derive(Debug, Default, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct AntigravityCommandsConfig {
+    pub daily: Option<SharedOptions>,
+    pub weekly: Option<SharedOptions>,
     pub monthly: Option<SharedOptions>,
     pub session: Option<SharedOptions>,
 }
@@ -1092,6 +1110,7 @@ mod tests {
             &["openclaw", "defaults"],
             &with_keys(&shared, &["openClawPath"]),
         );
+        assert_schema_properties(&schema, &["antigravity", "defaults"], &shared);
     }
 
     #[test]
@@ -1110,6 +1129,7 @@ mod tests {
         assert!(schema_property(&schema, &["openclaw", "defaults", "openClawPath"]).is_some());
         assert!(schema_property(&schema, &["kilo", "defaults", "openClawPath"]).is_none());
         assert!(schema_property(&schema, &["gemini", "defaults", "openClawPath"]).is_none());
+        assert!(schema_property(&schema, &["antigravity", "defaults", "openClawPath"]).is_none());
         assert!(schema_property(&schema, &["kimi", "defaults", "openClawPath"]).is_none());
         assert!(schema_property(&schema, &["qwen", "defaults", "openClawPath"]).is_none());
     }
@@ -1144,9 +1164,9 @@ mod tests {
             &schema,
             "turbotokens-config",
             &[
-                "$schema", "amp", "claude", "codebuff", "codex", "commands", "copilot", "defaults",
-                "gemini", "goose", "grok", "hermes", "kilo", "kimi", "opencode", "openclaw", "pi",
-                "qwen", "droid",
+                "$schema", "amp", "antigravity", "claude", "codebuff", "codex", "commands",
+                "copilot", "defaults", "gemini", "goose", "grok", "hermes", "kilo", "kimi",
+                "opencode", "openclaw", "pi", "qwen", "droid",
             ],
         );
         assert!(

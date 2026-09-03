@@ -888,6 +888,7 @@ dependencies = [
  "serde_json",
  "turbotokens-adapter-all",
  "turbotokens-adapter-amp",
+ "turbotokens-adapter-antigravity",
  "turbotokens-adapter-claude",
  "turbotokens-adapter-codebuff",
  "turbotokens-adapter-codex",
@@ -904,6 +905,7 @@ dependencies = [
  "turbotokens-adapter-opencode",
  "turbotokens-adapter-pi",
  "turbotokens-adapter-qwen",
+ "turbotokens-adapter-zcode",
  "turbotokens-cli",
  "turbotokens-cli-parser",
  "turbotokens-config",
@@ -920,6 +922,7 @@ dependencies = [
  "serde",
  "serde_json",
  "turbotokens-adapter-amp",
+ "turbotokens-adapter-antigravity",
  "turbotokens-adapter-claude",
  "turbotokens-adapter-codebuff",
  "turbotokens-adapter-codex",
@@ -936,6 +939,7 @@ dependencies = [
  "turbotokens-adapter-opencode",
  "turbotokens-adapter-pi",
  "turbotokens-adapter-qwen",
+ "turbotokens-adapter-zcode",
  "turbotokens-cli",
  "turbotokens-core",
  "turbotokens-test-support",
@@ -948,6 +952,19 @@ dependencies = [
  "jiff",
  "serde",
  "serde_json",
+ "turbotokens-adapter-common",
+ "turbotokens-core",
+ "turbotokens-test-support",
+]
+
+[[package]]
+name = "turbotokens-adapter-antigravity"
+version = "1.0.1"
+dependencies = [
+ "insta",
+ "jiff",
+ "serde_json",
+ "sqlite",
  "turbotokens-adapter-common",
  "turbotokens-core",
  "turbotokens-test-support",
@@ -1157,6 +1174,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "turbotokens-adapter-zcode"
+version = "1.0.1"
+dependencies = [
+ "insta",
+ "jiff",
+ "serde_json",
+ "sqlite",
+ "turbotokens-adapter-common",
+ "turbotokens-core",
+ "turbotokens-test-support",
+]
+
+[[package]]
 name = "turbotokens-cli"
 version = "1.0.1"
 
@@ -1216,6 +1246,8 @@ name = "turbotokens-test-support"
 version = "1.0.1"
 dependencies = [
  "assert_fs",
+ "jiff",
+ "sqlite",
 ]
 
 [[package]]

@@ -354,6 +354,24 @@ pub fn format_utc_minute(timestamp: TimestampMs) -> String {
     )
 }
 
+/// Formats a timestamp as `YYYY-MM-DD HH:MM` in the given timezone (system
+/// timezone when unset), for displaying absolute times like limit resets.
+pub fn format_minute(timestamp: TimestampMs, timezone: Option<&str>) -> String {
+    let Ok(jiff) = JiffTimestamp::from_millisecond(timestamp.as_millis()) else {
+        return format_utc_minute(timestamp);
+    };
+    let timezone = parse_tz(timezone).unwrap_or_else(JiffTimeZone::system);
+    let zoned = jiff.to_zoned(timezone);
+    format!(
+        "{:04}-{:02}-{:02} {:02}:{:02}",
+        i32::from(zoned.year()),
+        u32::from(zoned.month() as u8),
+        u32::from(zoned.day() as u8),
+        u32::from(zoned.hour() as u8),
+        u32::from(zoned.minute() as u8),
+    )
+}
+
 pub fn format_utc_second(timestamp: TimestampMs) -> String {
     let parts = timestamp.utc_parts();
     format!(
@@ -490,5 +508,22 @@ mod tests {
             Some("202602")
         ));
         assert!(!date_within_range("2025-12-31", Some("2026"), None));
+    }
+
+    #[test]
+    fn formats_minute_in_timezone() {
+        use super::{TimestampMs, format_minute};
+
+        let timestamp = TimestampMs::from_millis(JAN_2_UTC);
+        assert_eq!(format_minute(timestamp, Some("UTC")), "2026-01-02 00:00");
+        assert_eq!(
+            format_minute(timestamp, Some("Asia/Tokyo")),
+            "2026-01-02 09:00"
+        );
+        assert_eq!(
+            format_minute(timestamp, Some("not-a-timezone")),
+            format_minute(timestamp, None),
+            "unknown timezones fall back to the system zone"
+        );
     }
 }

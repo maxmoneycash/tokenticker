@@ -3,10 +3,11 @@ use std::{ffi::OsString, path::PathBuf};
 use crate::arg_parser::ArgParser;
 use crate::help::{print_help_and_exit, print_version_and_exit};
 use turbotokens_cli::{
-    AgentCommandArgs, AgentReportKind, BlocksArgs, CliConfig, CodexSpeed, Command, CompletionShell,
-    CompletionsArgs, CostMode, CostSource, DaemonAction, DaemonArgs, DailyArgs, LiveAgent,
-    LiveArgs, OPENCODE_AGENT_REPORTS, STANDARD_AGENT_REPORTS, SessionArgs, SharedArgs, SortOrder,
-    StatuslineArgs, VisualBurnRate, WeekDay, WeeklyArgs, normalize_date_bound,
+    ANTIGRAVITY_AGENT_REPORTS, AgentCommandArgs, AgentReportKind, BlocksArgs, CliConfig, CodexSpeed,
+    Command, CompletionShell, CompletionsArgs, CostMode, CostSource, DaemonAction, DaemonArgs,
+    DailyArgs, LimitsArgs, LimitsScope, LiveAgent, LiveArgs, OPENCODE_AGENT_REPORTS,
+    STANDARD_AGENT_REPORTS, SessionArgs, SharedArgs, SortOrder, StatuslineArgs, VisualBurnRate,
+    WeekDay, WeeklyArgs, ZCODE_AGENT_REPORTS, normalize_date_bound,
 };
 
 use crate::Cli;
@@ -361,6 +362,7 @@ fn parse_command(
             }
             Ok(Command::Doctor(shared))
         }
+        "limits" => parse_limits_command(parser, shared, LimitsScope::All),
         "completions" => {
             let Some(shell) = parser.peek().filter(|shell| !shell.starts_with('-')) else {
                 return Err("Usage: turbotokens completions <bash|zsh|fish>".to_string());
@@ -450,6 +452,13 @@ fn parse_command(
             STANDARD_AGENT_REPORTS,
             Command::Gemini,
         ),
+        "antigravity" => parse_basic_agent_command(
+            parser,
+            shared,
+            "antigravity",
+            ANTIGRAVITY_AGENT_REPORTS,
+            Command::Antigravity,
+        ),
         "kimi" => parse_basic_agent_command(
             parser,
             shared,
@@ -465,6 +474,13 @@ fn parse_command(
             Command::Qwen,
         ),
         "openclaw" => parse_openclaw_command(parser, shared, config),
+        "zcode" => parse_basic_agent_command(
+            parser,
+            shared,
+            "zcode",
+            ZCODE_AGENT_REPORTS,
+            Command::ZCode,
+        ),
         _ => Err(format!("Unknown command '{command}'")),
     }
 }
@@ -667,7 +683,10 @@ fn parse_claude_command(
     default_session_duration_hours: f64,
 ) -> Result<Command, String> {
     let command = match parser.peek() {
-        Some(command @ ("daily" | "monthly" | "weekly" | "session" | "blocks" | "statusline")) => {
+        Some(
+            command @ ("daily" | "monthly" | "weekly" | "session" | "blocks" | "statusline"
+            | "limits"),
+        ) => {
             let command = command.to_string();
             parser.next();
             command
@@ -682,6 +701,7 @@ fn parse_claude_command(
         "monthly" => parse_claude_monthly_command(parser, shared, config),
         "weekly" => parse_claude_weekly_command(parser, shared, config),
         "session" => parse_claude_session_command(parser, shared, config),
+        "limits" => parse_limits_command(parser, shared, LimitsScope::Claude),
         "blocks" | "statusline" => parse_command(
             &command,
             parser,
@@ -713,6 +733,10 @@ fn parse_codex_command(
     mut shared: SharedArgs,
     config: &dyn CliConfig,
 ) -> Result<Command, String> {
+    if matches!(parser.peek(), Some("limits")) {
+        parser.next();
+        return parse_limits_command(parser, shared, LimitsScope::Codex);
+    }
     let kind = parse_agent_report_kind(parser, "codex", STANDARD_AGENT_REPORTS)?;
     let mut codex_speed = CodexSpeed::Auto;
     config.apply_agent_args(&mut codex_speed, None, None);
@@ -792,6 +816,17 @@ fn parse_openclaw_command(
         open_claw_path,
         codex_speed,
     }))
+}
+
+fn parse_limits_command(
+    parser: &mut ArgParser,
+    mut shared: SharedArgs,
+    scope: LimitsScope,
+) -> Result<Command, String> {
+    while parser.peek().is_some() {
+        parse_shared_arg(parser, &mut shared)?;
+    }
+    Ok(Command::Limits(LimitsArgs { shared, scope }))
 }
 
 fn parse_agent_report_kind(
@@ -885,6 +920,7 @@ fn is_command(arg: &str) -> bool {
             | "live"
             | "daemon"
             | "doctor"
+            | "limits"
             | "completions"
             | "claude"
             | "codex"
@@ -900,8 +936,10 @@ fn is_command(arg: &str) -> bool {
             | "kilo"
             | "copilot"
             | "gemini"
+            | "antigravity"
             | "kimi"
             | "qwen"
+            | "zcode"
     )
 }
 
@@ -1070,9 +1108,11 @@ fn is_agent_command(command: &str) -> bool {
             | "kilo"
             | "copilot"
             | "gemini"
+            | "antigravity"
             | "kimi"
             | "qwen"
             | "openclaw"
+            | "zcode"
     )
 }
 
@@ -1080,10 +1120,12 @@ fn agent_report_supported(agent: &str, report: &str) -> bool {
     match agent {
         "claude" => matches!(
             report,
-            "daily" | "weekly" | "monthly" | "session" | "blocks" | "statusline"
+            "daily" | "weekly" | "monthly" | "session" | "blocks" | "statusline" | "limits"
         ),
-        "codex" => matches!(report, "daily" | "monthly" | "session"),
-        "opencode" => matches!(report, "daily" | "weekly" | "monthly" | "session"),
+        "codex" => matches!(report, "daily" | "monthly" | "session" | "limits"),
+        "opencode" | "antigravity" | "zcode" => {
+            matches!(report, "daily" | "weekly" | "monthly" | "session")
+        }
         "amp" | "droid" | "codebuff" | "hermes" | "pi" | "goose" | "grok" | "kilo" | "copilot"
         | "gemini" | "kimi" | "qwen" | "openclaw" => {
             matches!(report, "daily" | "monthly" | "session")
@@ -1107,9 +1149,11 @@ fn agent_display_name(agent: &str) -> &'static str {
         "kilo" => "Kilo",
         "copilot" => "GitHub Copilot CLI",
         "gemini" => "Gemini CLI",
+        "antigravity" => "Antigravity",
         "kimi" => "Kimi",
         "qwen" => "Qwen",
         "openclaw" => "OpenClaw",
+        "zcode" => "ZCode",
         _ => unreachable!("agent is prevalidated"),
     }
 }
@@ -1172,6 +1216,7 @@ fn last_option_error(command: Option<&Command>, root_shared: &SharedArgs) -> Opt
         Some(Command::Live(args)) => (&args.shared, false),
         Some(Command::Daemon(args)) => (&args.shared, false),
         Some(Command::Doctor(shared)) => (shared, false),
+        Some(Command::Limits(args)) => (&args.shared, false),
         Some(Command::Completions(_)) => (root_shared, false),
         Some(
             Command::Codex(args)
@@ -1186,9 +1231,11 @@ fn last_option_error(command: Option<&Command>, root_shared: &SharedArgs) -> Opt
             | Command::Kilo(args)
             | Command::Copilot(args)
             | Command::Gemini(args)
+            | Command::Antigravity(args)
             | Command::Kimi(args)
             | Command::Qwen(args)
-            | Command::OpenClaw(args),
+            | Command::OpenClaw(args)
+            | Command::ZCode(args),
         ) => (&args.shared, args.kind != AgentReportKind::Session),
     };
     shared.last?;

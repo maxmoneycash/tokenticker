@@ -36,6 +36,7 @@ fn main() -> Result<()> {
         Some(Command::Live(args)) => commands::run_live(args),
         Some(Command::Daemon(args)) => commands::run_daemon(args),
         Some(Command::Doctor(shared)) => commands::run_doctor(shared),
+        Some(Command::Limits(args)) => commands::run_limits(args),
         Some(Command::Completions(args)) => commands::run_completions(args),
         Some(Command::Codex(args)) => adapter::codex::run(args),
         Some(Command::OpenCode(args)) => adapter::opencode::run(args),
@@ -50,8 +51,10 @@ fn main() -> Result<()> {
         Some(Command::Qwen(args)) => adapter::qwen::run(args),
         Some(Command::Copilot(args)) => adapter::copilot::run(args),
         Some(Command::Gemini(args)) => adapter::gemini::run(args),
+        Some(Command::Antigravity(args)) => adapter::antigravity::run(args),
         Some(Command::Kimi(args)) => adapter::kimi::run(args),
         Some(Command::OpenClaw(args)) => adapter::openclaw::run(args),
+        Some(Command::ZCode(args)) => adapter::zcode::run(args),
         None => {
             let args = AgentCommandArgs {
                 shared: cli.shared,
@@ -90,8 +93,9 @@ mod tests {
 
     #[test]
     fn agent_commands_are_exposed_by_independent_crates() {
-        let runs: [fn(AgentCommandArgs) -> Result<()>; 15] = [
+        let runs: [fn(AgentCommandArgs) -> Result<()>; 17] = [
             turbotokens_adapter_amp::run,
+            turbotokens_adapter_antigravity::run,
             turbotokens_adapter_codebuff::run,
             turbotokens_adapter_codex::run,
             turbotokens_adapter_copilot::run,
@@ -106,9 +110,10 @@ mod tests {
             turbotokens_adapter_opencode::run,
             turbotokens_adapter_pi::run,
             turbotokens_adapter_qwen::run,
+            turbotokens_adapter_zcode::run,
         ];
 
-        assert_eq!(runs.len(), 15);
+        assert_eq!(runs.len(), 17);
     }
 
     #[test]

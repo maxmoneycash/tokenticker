@@ -657,7 +657,7 @@ mod tests {
             "#compdef turbotokens",
             "compdef _turbotokens turbotokens",
             "compadd -- auto calculate display",
-            "subs=(daily monthly weekly session blocks statusline)",
+            "subs=(daily monthly weekly session blocks statusline limits)",
             "--start-of-week",
         ] {
             assert!(script.contains(needle), "zsh script missing {needle}");

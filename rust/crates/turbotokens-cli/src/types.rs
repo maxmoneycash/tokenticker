@@ -27,9 +27,12 @@ pub enum Command {
     Kilo(AgentCommandArgs),
     Copilot(AgentCommandArgs),
     Gemini(AgentCommandArgs),
+    Antigravity(AgentCommandArgs),
     Kimi(AgentCommandArgs),
     Qwen(AgentCommandArgs),
     OpenClaw(AgentCommandArgs),
+    Limits(LimitsArgs),
+    ZCode(AgentCommandArgs),
 }
 
 #[derive(Clone, Debug, Default)]
@@ -152,6 +155,21 @@ pub enum CompletionShell {
 }
 
 #[derive(Clone)]
+pub struct LimitsArgs {
+    pub shared: SharedArgs,
+    pub scope: LimitsScope,
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum LimitsScope {
+    /// Every supported agent with readable credentials.
+    #[default]
+    All,
+    Claude,
+    Codex,
+}
+
+#[derive(Clone)]
 pub struct StatuslineArgs {
     pub offline: bool,
     pub no_offline: bool,
@@ -200,6 +218,20 @@ pub const STANDARD_AGENT_REPORTS: &[(&str, AgentReportKind)] = &[
 ];
 
 pub const OPENCODE_AGENT_REPORTS: &[(&str, AgentReportKind)] = &[
+    ("daily", AgentReportKind::Daily),
+    ("weekly", AgentReportKind::Weekly),
+    ("monthly", AgentReportKind::Monthly),
+    ("session", AgentReportKind::Session),
+];
+
+pub const ANTIGRAVITY_AGENT_REPORTS: &[(&str, AgentReportKind)] = &[
+    ("daily", AgentReportKind::Daily),
+    ("weekly", AgentReportKind::Weekly),
+    ("monthly", AgentReportKind::Monthly),
+    ("session", AgentReportKind::Session),
+];
+
+pub const ZCODE_AGENT_REPORTS: &[(&str, AgentReportKind)] = &[
     ("daily", AgentReportKind::Daily),
     ("weekly", AgentReportKind::Weekly),
     ("monthly", AgentReportKind::Monthly),

@@ -75,18 +75,22 @@ pub struct TokenCounts {
 
 impl TokenCounts {
     pub fn add_usage(&mut self, usage: TokenUsageRaw) {
-        self.input_tokens += usage.input_tokens;
-        self.output_tokens += usage.output_tokens;
-        self.cache_creation_tokens += usage.cache_creation_token_count();
-        self.cache_read_tokens += usage.cache_read_input_tokens;
+        self.input_tokens = self.input_tokens.saturating_add(usage.input_tokens);
+        self.output_tokens = self.output_tokens.saturating_add(usage.output_tokens);
+        self.cache_creation_tokens = self
+            .cache_creation_tokens
+            .saturating_add(usage.cache_creation_token_count());
+        self.cache_read_tokens = self
+            .cache_read_tokens
+            .saturating_add(usage.cache_read_input_tokens);
     }
 
     pub fn total(&self) -> u64 {
         self.input_tokens
-            + self.output_tokens
-            + self.cache_creation_tokens
-            + self.cache_read_tokens
-            + self.extra_total_tokens
+            .saturating_add(self.output_tokens)
+            .saturating_add(self.cache_creation_tokens)
+            .saturating_add(self.cache_read_tokens)
+            .saturating_add(self.extra_total_tokens)
     }
 }
 
@@ -166,9 +170,9 @@ pub struct UsageSummary {
 impl UsageSummary {
     pub fn total_tokens(&self) -> u64 {
         self.input_tokens
-            + self.output_tokens
-            + self.cache_creation_tokens
-            + self.cache_read_tokens
-            + self.extra_total_tokens
+            .saturating_add(self.output_tokens)
+            .saturating_add(self.cache_creation_tokens)
+            .saturating_add(self.cache_read_tokens)
+            .saturating_add(self.extra_total_tokens)
     }
 }

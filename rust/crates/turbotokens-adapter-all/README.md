@@ -20,6 +20,7 @@ themselves independent of each other.
 ## Depends on
 
 - `turbotokens-adapter-amp`
+- `turbotokens-adapter-antigravity`
 - `turbotokens-adapter-claude`
 - `turbotokens-adapter-codebuff`
 - `turbotokens-adapter-codex`
@@ -36,6 +37,7 @@ themselves independent of each other.
 - `turbotokens-adapter-opencode`
 - `turbotokens-adapter-pi`
 - `turbotokens-adapter-qwen`
+- `turbotokens-adapter-zcode`
 - `turbotokens-cli`
 - `turbotokens-core`
 - `serde`
