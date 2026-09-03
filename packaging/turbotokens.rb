@@ -1,7 +1,7 @@
 class Turbotokens < Formula
   desc "Real-time token and cost telemetry for AI coding agents"
   homepage "https://github.com/maxmoneycash/turbotokens"
-  version "1.0.1"
+  version "1.1.0"
   # NOTE for maintainer: on each release, update `version` and the three
   # sha256 values (shasum -a 256 on the GitHub release assets), then push to
   # the tap repo: github.com/maxmoneycash/homebrew-tap, Formula/turbotokens.rb
